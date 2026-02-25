@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💫 FIBER OPTIC · главная</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 50px 0;
+            max-width: 800px;
+            margin: 50px auto;
+        }
+        
+        .role-card {
+            background: rgba(20, 30, 50, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid #4facfe;
+            border-radius: 40px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(79, 172, 254, 0.2);
+        }
+        
+        .role-card:hover {
+            transform: translateY(-10px);
+            border-color: #00f2fe;
+            box-shadow: 0 0 60px #4facfe;
+        }
+        
+        .role-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .role-title {
+            color: #4facfe;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .role-desc {
+            color: white;
+            opacity: 0.8;
+        }
+        
+        .fiber-lines {
+            margin-top: 50px;
+            color: #4facfe;
+            font-size: 30px;
+            letter-spacing: 10px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="photons"></div>
+    
+    <div class="container">
+        <div class="glass-card text-center">
+            <div style="font-size: 100px; margin-bottom: 20px; animation: fadeIn 1s;">💫</div>
+            <h1 style="color: #4facfe; font-size: 4rem; margin-bottom: 10px;">FIBER OPTIC</h1>
+            <div style="color: white; font-size: 1.3rem; margin-bottom: 50px;">полное внутреннее отражение · световоды</div>
+            
+            <div class="role-selector">
+                <div class="role-card" onclick="location.href='teacher.html'">
+                    <div class="role-icon">👨‍🔬</div>
+                    <div class="role-title">Учитель</div>
+                    <div class="role-desc">создать тест · управлять</div>
+                </div>
+                
+                <div class="role-card" onclick="location.href='student.html'">
+                    <div class="role-icon">📡</div>
+                    <div class="role-title">Ученик</div>
+                    <div class="role-desc">пройти тест · собирать знания</div>
+                </div>
+            </div>
+            
+            <div class="fiber-lines">〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️</div>
+        </div>
+    </div>
+
+    <script>
+        // Создаём фотоны
+        for (let i = 0; i < 30; i++) {
+            const photon = document.createElement('div');
+            photon.className = 'photon';
+            photon.style.left = Math.random() * 100 + '%';
+            photon.style.top = Math.random() * 100 + '%';
+            photon.style.animationDelay = Math.random() * 10 + 's';
+            photon.style.animationDuration = (10 + Math.random() * 20) + 's';
+            document.getElementById('photons').appendChild(photon);
+        }
+    </script>
+</body>
+</html>
