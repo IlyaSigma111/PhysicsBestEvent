@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👨‍🔬 учитель · FIBER OPTIC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .code-display {
+            font-size: 5rem;
+            font-family: monospace;
+            color: #4facfe;
+            text-align: center;
+            margin: 30px 0;
+            letter-spacing: 10px;
+            text-shadow: 0 0 30px #4facfe;
+        }
+        
+        .student-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .student-item {
+            background: rgba(30, 40, 60, 0.8);
+            border: 1px solid #4facfe;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(30, 40, 60, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="photons"></div>
+    
+    <div class="container">
+        <div class="glass-card">
+            <h1 style="color: #4facfe; margin-bottom: 30px;">👨‍🔬 Учитель</h1>
+            
+            <button class="btn" onclick="createGame()">➕ Создать новый тест</button>
+            
+            <div id="gamePanel" class="hidden">
+                <div class="code-display" id="gameCode">000000</div>
+                
+                <div class="timer" id="timer">15:00</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn" onclick="startGame()">▶ Старт</button>
+                    <button class="btn danger" onclick="finishGame()">⏹ Финиш</button>
+                </div>
+                
+                <h2 style="color: white; margin-top: 30px;">👥 Ученики (<span id="studentsCount">0</span>)</h2>
+                <div class="student-list" id="studentsList">
+                    <div style="color: #4facfe; text-align: center;">Ожидание учеников...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-card" style="margin-top: 20px;" id="statsPanel">
+            <h2 style="color: #4facfe; margin-bottom: 20px;">🏆 Лидерборд</h2>
+            <div id="leaderboard"></div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPlayers">0</div>
+                    <div style="color: white;">всего</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedPlayers">0</div>
+                    <div style="color: white;">завершили</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgScore">0</div>
+                    <div style="color: white;">средний балл</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="maxScore">0</div>
+                    <div style="color: white;">максимум</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Создаём фотоны
+        for (let i = 0; i < 20; i++) {
+            const photon = document.createElement('div');
+            photon.className = 'photon';
+            photon.style.left = Math.random() * 100 + '%';
+            photon.style.top = Math.random() * 100 + '%';
+            photon.style.animationDelay = Math.random() * 10 + 's';
+            photon.style.animationDuration = (10 + Math.random() * 20) + 's';
+            document.getElementById('photons').appendChild(photon);
+        }
+
+        let gameId = null;
+        let timerInterval = null;
+
+        function createGame() {
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            gameId = `game_${code}`;
+            
+            db.ref(`games/${gameId}`).set({
+                status: 'waiting',
+                startTime: null,
+                timeLimit: 900,
+                players: {},
+                createdAt: Date.now()
+            }).then(() => {
+                document.getElementById('gameCode').innerText = code;
+                document.getElementById('gamePanel').classList.remove('hidden');
+                listenToGame();
+            }).catch(error => {
+                alert('Ошибка создания теста');
+                console.error(error);
+            });
+        }
+
+        function listenToGame() {
+            db.ref(`games/${gameId}`).on('value', (snap) => {
+                const data = snap.val();
+                if (!data) return;
+                
+                updateStudentsList(data.players);
+                updateLeaderboard(data.players);
+                
+                if (data.status === 'active' && data.startTime) {
+                    updateTimer(data.startTime, data.timeLimit);
+                }
+            });
+        }
+
+        function updateStudentsList(players) {
+            const list = document.getElementById('studentsList');
+            const count = document.getElementById('studentsCount');
+            
+            if (!players || Object.keys(players).length === 0) {
+                list.innerHTML = '<div style="color: #4facfe; text-align: center;">Ожидание учеников...</div>';
+                count.innerText = '0';
+                return;
+            }
+            
+            const playersArray = Object.entries(players);
+            count.innerText = playersArray.length;
+            
+            let html = '';
+            playersArray.forEach(([name, player]) => {
+                const progress = player.progress || 0;
+                const percent = (progress / 7) * 100;
+                
+                html += `
+                    <div class="student-item">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>👤 ${name}</span>
+                            <span>${progress}/7 · ${player.score || 0}✨</span>
+                        </div>
+                        <div class="progress-bar" style="margin: 0;">
+                            <div class="progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
+
+        function updateLeaderboard(players) {
+            if (!players || Object.keys(players).length === 0) {
+                document.getElementById('leaderboard').innerHTML = '<div style="color: #4facfe; text-align: center;">Нет результатов</div>';
+                return;
+            }
+            
+            const playersArray = Object.entries(players)
+                .filter(([_, p]) => p.score !== undefined)
+                .sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
+            
+            // Статистика
+            const total = Object.keys(players).length;
+            const completed = playersArray.filter(([_, p]) => p.progress === 7).length;
+            const scores = playersArray.map(([_, p]) => p.score || 0);
+            const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            const max = scores.length ? Math.max(...scores) : 0;
+            
+            document.getElementById('totalPlayers').innerText = total;
+            document.getElementById('completedPlayers').innerText = completed;
+            document.getElementById('avgScore').innerText = avg;
+            document.getElementById('maxScore').innerText = max;
+            
+            // Лидерборд
+            let lbHtml = '<div class="leaderboard">';
+            playersArray.slice(0, 10).forEach(([name, player], index) => {
+                const rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : ''));
+                lbHtml += `
+                    <div class="leaderboard-item">
+                        <span class="${rankClass}">${index + 1}. ${name}</span>
+                        <span>${player.score || 0} ✨</span>
+                    </div>
+                `;
+            });
+            lbHtml += '</div>';
+            
+            document.getElementById('leaderboard').innerHTML = lbHtml;
+        }
+
+        function updateTimer(startTime, limit) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, limit - elapsed);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                
+                document.getElementById('timer').innerText = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    forceFinishGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            if (!gameId) return;
+            
+            db.ref(`games/${gameId}`).update({
+                status: 'active',
+                startTime: Date.now()
+            }).then(() => {
+                console.log('✅ Тест начат');
+            });
+        }
+
+        function finishGame() {
+            if (!gameId) return;
+            if (!confirm('Завершить тест?')) return;
+            forceFinishGame();
+        }
+
+        function forceFinishGame() {
+            db.ref(`games/${gameId}`).update({
+                status: 'finished',
+                finishedAt: Date.now()
+            }).then(() => {
+                if (timerInterval) clearInterval(timerInterval);
+                document.getElementById('timer').innerText = '00:00';
+            });
+        }
+    </script>
+</body>
+</html>
