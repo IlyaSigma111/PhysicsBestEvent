@@ -196,6 +196,10 @@
             color: #0a84ff;
             font-weight: 600;
             font-size: 1.1rem;
+            background: #2c2c30;
+            padding: 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #4a4a50;
         }
 
         .student-progress {
@@ -203,6 +207,7 @@
             background: #4a4a50;
             border-radius: 6px;
             overflow: hidden;
+            margin: 8px 0;
         }
 
         .student-progress-fill {
@@ -210,6 +215,19 @@
             background: #0a84ff;
             width: 0%;
             transition: width 0.3s;
+        }
+
+        .student-status {
+            display: flex;
+            justify-content: space-between;
+            color: #9e9e9e;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .student-submitted {
+            color: #4cd964;
+            font-weight: 500;
         }
 
         /* ПРАВАЯ КОЛОНКА - ЛОГИ */
@@ -227,6 +245,9 @@
 
         .logs-header {
             margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logs-header h2 {
@@ -235,90 +256,101 @@
             color: #ffffff;
         }
 
+        .logs-filter {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            background: #3a3a40;
+            border: 1px solid #4a4a50;
+            color: #9e9e9e;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #0a84ff;
+            color: white;
+            border-color: #0a84ff;
+        }
+
         .logs-list {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .log-entry {
             background: #3a3a40;
             border-radius: 16px;
-            padding: 16px;
+            padding: 18px;
             border: 1px solid #4a4a50;
             animation: fadeIn 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .log-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            background: #4a4a50;
-        }
-
-        .log-content {
-            flex: 1;
-        }
-
-        .log-name {
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-            font-size: 1rem;
-        }
-
-        .log-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .log-question {
-            color: #9e9e9e;
-            font-size: 0.9rem;
-            background: #4a4a50;
-            padding: 2px 10px;
-            border-radius: 30px;
-        }
-
-        .log-result {
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 2px 10px;
-            border-radius: 30px;
-        }
-
-        .result-correct {
-            background: #1e4a3b;
-            color: #4cd964;
-            border: 1px solid #4cd964;
-        }
-
-        .result-wrong {
-            background: #4a2b2b;
-            color: #ff453a;
-            border: 1px solid #ff453a;
-        }
-
-        .log-time {
-            color: #9e9e9e;
-            font-size: 0.75rem;
-            margin-top: 4px;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .log-name {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        .log-time {
+            color: #9e9e9e;
+            font-size: 0.8rem;
+        }
+
+        .log-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .progress-badge {
+            background: #2c2c30;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            border: 1px solid #4a4a50;
+        }
+
+        .progress-badge.one-third {
+            color: #ff9f0a;
+            border-color: #ff9f0a;
+        }
+
+        .progress-badge.two-thirds {
+            color: #4cd964;
+            border-color: #4cd964;
+        }
+
+        .progress-badge.submitted {
+            color: #0a84ff;
+            border-color: #0a84ff;
+            background: rgba(10, 132, 255, 0.1);
+        }
+
+        .log-message {
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
 
         .empty-state {
@@ -390,11 +422,16 @@
             <!-- Правая колонка - логи -->
             <div class="logs-panel">
                 <div class="logs-header">
-                    <h2>📝 Активность</h2>
+                    <h2>📝 События</h2>
+                    <div class="logs-filter">
+                        <span class="filter-btn active" onclick="filterLogs('all')">Все</span>
+                        <span class="filter-btn" onclick="filterLogs('progress')">Прогресс</span>
+                        <span class="filter-btn" onclick="filterLogs('submits')">Отправки</span>
+                    </div>
                 </div>
                 
                 <div class="logs-list" id="logsList">
-                    <div class="empty-state">Здесь появятся ответы учеников</div>
+                    <div class="empty-state">Здесь появятся события</div>
                 </div>
             </div>
         </div>
@@ -414,15 +451,12 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Правильные ответы для проверки (30 вопросов)
-        const CORRECT_ANSWERS = {
-            1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 0, 7: 3, 8: 1, 9: 2, 10: 2,
-            11: 1, 12: 1, 13: 1, 14: 0, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1, 20: 1,
-            21: 1, 22: 1, 23: 0, 24: 1, 25: 0, 26: 1, 27: 1, 28: 1, 29: 0, 30: 1
-        };
-
         let gameId = null;
         let timerInterval = null;
+        let currentFilter = 'all';
+        
+        // Храним предыдущий прогресс учеников
+        let lastProgress = {};
 
         window.createGame = function() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -433,7 +467,7 @@
                 startTime: null,
                 timeLimit: 900,
                 players: {},
-                logs: {}
+                events: {}  // events вместо logs
             }).then(() => {
                 document.getElementById('gameCode').innerText = code;
                 document.getElementById('createBtn').style.display = 'none';
@@ -442,8 +476,7 @@
                 
                 listenToGame();
                 
-                // Системное сообщение
-                addLog('Система', 'Тест создан', 'system');
+                addEvent('Система', 'system', 'Тест создан');
             });
         };
 
@@ -453,55 +486,52 @@
                 if (!data) return;
                 
                 updateStudentsList(data.players);
-                updateLogs(data.logs);
+                updateEvents(data.events);
                 
                 if (data.status === 'active' && data.startTime) {
                     startTimer(data.startTime, data.timeLimit);
                 }
             });
 
-            // Слушаем ответы учеников для логов с проверкой
+            // Следим за прогрессом учеников
             db.ref(`games/${gameId}/players`).on('child_changed', (snap) => {
                 const playerName = snap.key;
                 const playerData = snap.val();
                 
                 if (playerData.answers) {
-                    // Проверяем последний отвеченный вопрос
-                    const answers = playerData.answers;
-                    const answeredQuestions = Object.keys(answers);
+                    const answeredCount = Object.keys(playerData.answers).length;
+                    const prevCount = lastProgress[playerName] || 0;
                     
-                    if (answeredQuestions.length > 0) {
-                        const lastQuestion = Math.max(...answeredQuestions.map(Number));
-                        const userAnswer = answers[lastQuestion];
-                        const isCorrect = (userAnswer === CORRECT_ANSWERS[lastQuestion]);
-                        
-                        addLog(
-                            playerName, 
-                            `Вопрос ${lastQuestion}`, 
-                            'answer',
-                            isCorrect
-                        );
+                    // Проверяем milestones: 10 (1/3), 20 (2/3), 30 (отправка)
+                    if (answeredCount >= 10 && prevCount < 10) {
+                        addEvent(playerName, 'progress', 'ответил на 10 вопросов (1/3)');
                     }
+                    if (answeredCount >= 20 && prevCount < 20) {
+                        addEvent(playerName, 'progress', 'ответил на 20 вопросов (2/3)');
+                    }
+                    
+                    lastProgress[playerName] = answeredCount;
+                }
+                
+                // Проверяем отправку результатов
+                if (playerData.submittedAt && !lastProgress[`${playerName}_submitted`]) {
+                    addEvent(playerName, 'submit', `отправил результаты · ${playerData.score || 0} баллов`);
+                    lastProgress[`${playerName}_submitted`] = true;
                 }
             });
         }
 
-        function addLog(name, action, type, isCorrect = null) {
+        function addEvent(name, type, message) {
             if (!gameId) return;
             
-            const logData = {
+            const eventData = {
                 name: name,
-                action: action,
                 type: type,
+                message: message,
                 timestamp: Date.now()
             };
             
-            if (isCorrect !== null) {
-                logData.isCorrect = isCorrect;
-                logData.question = action.replace('Вопрос ', '');
-            }
-            
-            db.ref(`games/${gameId}/logs`).push().set(logData);
+            db.ref(`games/${gameId}/events`).push().set(eventData);
         }
 
         function updateStudentsList(players) {
@@ -521,15 +551,26 @@
             playersArray.forEach(([name, player]) => {
                 const answered = player.answers ? Object.keys(player.answers).length : 0;
                 const percent = (answered / 30) * 100;
+                const isSubmitted = player.submittedAt ? true : false;
                 
                 html += `
                     <div class="student-card">
                         <div class="student-info">
                             <span class="student-name">${name}</span>
-                            <span class="student-score">${player.score || 0} ✨</span>
+                            ${isSubmitted ? 
+                                `<span class="student-score">${player.score || 0} ✨</span>` : 
+                                `<span class="student-score">${answered}/30</span>`
+                            }
                         </div>
                         <div class="student-progress">
                             <div class="student-progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="student-status">
+                            <span>${answered}/30 ответов</span>
+                            ${isSubmitted ? 
+                                '<span class="student-submitted">✓ Отправлено</span>' : 
+                                '<span>⏳ В процессе</span>'
+                            }
                         </div>
                     </div>
                 `;
@@ -538,56 +579,83 @@
             list.innerHTML = html;
         }
 
-        function updateLogs(logsData) {
-            const logsList = document.getElementById('logsList');
+        function updateEvents(events) {
+            const eventsList = document.getElementById('logsList');
             
-            if (!logsData || Object.keys(logsData).length === 0) {
-                logsList.innerHTML = '<div class="empty-state">Здесь появятся ответы учеников</div>';
+            if (!events || Object.keys(events).length === 0) {
+                eventsList.innerHTML = '<div class="empty-state">Здесь появятся события</div>';
                 return;
             }
             
-            const logsArray = Object.entries(logsData)
+            const eventsArray = Object.entries(events)
                 .sort((a, b) => b[1].timestamp - a[1].timestamp)
+                .filter(([_, event]) => {
+                    if (currentFilter === 'all') return true;
+                    if (currentFilter === 'progress') return event.type === 'progress';
+                    if (currentFilter === 'submits') return event.type === 'submit' || event.type === 'system';
+                    return true;
+                })
                 .slice(0, 50);
             
+            if (eventsArray.length === 0) {
+                eventsList.innerHTML = '<div class="empty-state">Нет событий по фильтру</div>';
+                return;
+            }
+            
             let html = '';
-            logsArray.forEach(([id, log]) => {
-                const time = new Date(log.timestamp).toLocaleTimeString('ru-RU', { 
+            eventsArray.forEach(([id, event]) => {
+                const time = new Date(event.timestamp).toLocaleTimeString('ru-RU', { 
                     hour: '2-digit', 
                     minute: '2-digit',
                     second: '2-digit'
                 });
                 
-                let icon = '📌';
-                let resultClass = '';
-                let resultText = '';
-                
-                if (log.type === 'answer') {
-                    icon = log.isCorrect ? '✅' : '❌';
-                    resultClass = log.isCorrect ? 'result-correct' : 'result-wrong';
-                    resultText = log.isCorrect ? 'Правильно' : 'Неправильно';
-                } else if (log.type === 'system') {
-                    icon = '⚙️';
+                let badgeClass = '';
+                if (event.type === 'progress') {
+                    if (event.message.includes('10')) badgeClass = 'one-third';
+                    if (event.message.includes('20')) badgeClass = 'two-thirds';
                 }
+                if (event.type === 'submit') badgeClass = 'submitted';
                 
                 html += `
                     <div class="log-entry">
-                        <div class="log-icon">${icon}</div>
-                        <div class="log-content">
-                            <div class="log-name">${log.name}</div>
-                            <div class="log-detail">
-                                ${log.question ? `<span class="log-question">Вопрос ${log.question}</span>` : ''}
-                                ${resultText ? `<span class="log-result ${resultClass}">${resultText}</span>` : ''}
-                                <span style="color: #9e9e9e; font-size: 0.9rem;">${log.action}</span>
-                            </div>
-                            <div class="log-time">${time}</div>
+                        <div class="log-header">
+                            <span class="log-name">${event.name}</span>
+                            <span class="log-time">${time}</span>
+                        </div>
+                        <div class="log-progress">
+                            <span class="progress-badge ${badgeClass}">
+                                ${event.type === 'progress' ? '📊 Прогресс' : 
+                                  event.type === 'submit' ? '📨 Отправка' : 
+                                  '⚙️ Система'}
+                            </span>
+                        </div>
+                        <div class="log-message">
+                            ${event.message}
                         </div>
                     </div>
                 `;
             });
             
-            logsList.innerHTML = html;
+            eventsList.innerHTML = html;
         }
+
+        window.filterLogs = function(filter) {
+            currentFilter = filter;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Обновляем список
+            if (gameId) {
+                db.ref(`games/${gameId}/events`).once('value', (snap) => {
+                    updateEvents(snap.val());
+                });
+            }
+        };
 
         function startTimer(startTime, limit) {
             if (timerInterval) clearInterval(timerInterval);
@@ -615,7 +683,7 @@
                 startTime: Date.now()
             });
             
-            addLog('Система', 'Тест начат', 'system');
+            addEvent('Система', 'system', 'Тест начат');
         };
 
         window.finishGame = function() {
@@ -627,7 +695,7 @@
                     if (timerInterval) clearInterval(timerInterval);
                 });
                 
-                addLog('Система', 'Тест завершён', 'system');
+                addEvent('Система', 'system', 'Тест завершён');
             }
         };
     </script>
