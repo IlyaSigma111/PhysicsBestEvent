@@ -4,307 +4,348 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Учитель · FIBER OPTIC</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        /* ===== APPLE СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
             background: #f5f5f7;
-            overflow: auto;
-            padding: 30px;
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
         }
-        
-        .teacher-container {
-            max-width: 1400px;
-            margin: 0 auto;
+
+        /* КОНТЕЙНЕР НА ВЕСЬ ЭКРАН */
+        .teacher-dashboard {
             width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
-        
-        /* ШАПКА С КОДОМ */
-        .header-premium {
+
+        /* ВЕРХНЯЯ ПАНЕЛЬ */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 20px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            border-radius: 28px;
-            padding: 20px 32px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            border: 1px solid #f0f0f3;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         }
-        
-        .code-box {
+
+        .code-section {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
         }
-        
+
         .code-label {
             color: #6e6e73;
             font-size: 0.9rem;
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         .code-value {
-            font-family: 'SF Mono', monospace;
+            font-family: 'SF Mono', 'Courier New', monospace;
             font-size: 2.5rem;
             font-weight: 600;
             color: #1d1d1f;
-            letter-spacing: 4px;
             background: #f5f5f7;
             padding: 8px 24px;
-            border-radius: 16px;
+            border-radius: 20px;
+            letter-spacing: 4px;
         }
-        
+
         .timer-value {
-            font-family: 'SF Mono', monospace;
-            font-size: 2rem;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 2.2rem;
             font-weight: 500;
             color: #1d1d1f;
             background: #f5f5f7;
             padding: 8px 24px;
-            border-radius: 16px;
+            border-radius: 20px;
         }
-        
-        .controls {
+
+        .control-buttons {
             display: flex;
             gap: 12px;
         }
-        
-        /* ДВЕ КОЛОНКИ */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 30px;
+
+        .apple-btn {
+            background: #0071e3;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
+
+        .apple-btn:hover {
+            background: #0077ed;
+            transform: scale(1.02);
+        }
+
+        .apple-btn.secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1d1d1f;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .apple-btn.secondary:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ОСНОВНОЙ КОНТЕЙНЕР С ДВУМЯ КОЛОНКАМИ */
+        .main-panel {
+            display: flex;
+            gap: 24px;
+            flex: 1;
+            min-height: 0;
+        }
+
         /* ЛЕВАЯ КОЛОНКА - УЧЕНИКИ */
-        .students-section {
-            background: white;
+        .students-panel {
+            flex: 1.2;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 28px;
-            padding: 24px;
-            height: fit-content;
-            border: 1px solid #f0f0f3;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
-        
-        .students-header {
+
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
-        
+
+        .panel-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
         .students-count {
             background: #f5f5f7;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 30px;
             color: #1d1d1f;
-            font-size: 0.9rem;
+            font-weight: 500;
         }
-        
+
         .students-list {
-            max-height: 600px;
+            flex: 1;
             overflow-y: auto;
             padding-right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        
-        .student-item {
+
+        .student-card {
             background: #f5f5f7;
             border-radius: 20px;
             padding: 18px;
-            margin-bottom: 12px;
-            transition: all 0.2s;
             border: 1px solid #e9e9ed;
+            transition: all 0.2s;
         }
-        
-        .student-item:hover {
-            background: #ffffff;
+
+        .student-card:hover {
             border-color: #0071e3;
         }
-        
-        .student-row {
+
+        .student-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
-        
+
         .student-name {
             font-weight: 600;
             font-size: 1.1rem;
             color: #1d1d1f;
         }
-        
-        .student-status {
-            color: #6e6e73;
-            font-size: 0.9rem;
+
+        .student-score {
+            color: #0071e3;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
-        
+
         .student-progress {
-            height: 4px;
+            height: 6px;
             background: #e9e9ed;
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
         }
-        
+
         .student-progress-fill {
             height: 100%;
             background: #0071e3;
             width: 0%;
+            transition: width 0.3s;
         }
-        
+
         /* ПРАВАЯ КОЛОНКА - ЛОГИ */
-        .logs-section {
-            background: white;
+        .logs-panel {
+            flex: 0.8;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 28px;
-            padding: 24px;
-            height: fit-content;
-            border: 1px solid #f0f0f3;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
-        
+
         .logs-header {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
-        
-        .logs-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        .log-item {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f3;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            animation: fadeIn 0.3s;
-        }
-        
-        .log-icon {
-            width: 32px;
-            height: 32px;
-            background: #f5f5f7;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-        
-        .log-content {
-            flex: 1;
-        }
-        
-        .log-name {
+
+        .logs-header h2 {
+            font-size: 1.5rem;
             font-weight: 600;
             color: #1d1d1f;
-            margin-bottom: 4px;
         }
-        
-        .log-action {
-            color: #6e6e73;
-            font-size: 0.9rem;
+
+        .logs-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        
-        .log-time {
-            color: #6e6e73;
-            font-size: 0.8rem;
-            margin-top: 4px;
+
+        .log-entry {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #e9e9ed;
+            animation: fadeIn 0.3s;
         }
-        
-        .log-correct {
-            color: #28cd41;
-            font-weight: 500;
-        }
-        
-        .log-wrong {
-            color: #ff3b30;
-            font-weight: 500;
-        }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .empty-logs {
-            text-align: center;
-            padding: 40px;
+
+        .log-name {
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .log-action {
             color: #6e6e73;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
         }
-        
-        /* КНОПКИ APPLE */
-        .apple-button.small {
-            padding: 8px 16px;
-            font-size: 0.85rem;
+
+        .log-time {
+            color: #6e6e73;
+            font-size: 0.8rem;
         }
-        
+
+        .empty-state {
+            color: #6e6e73;
+            text-align: center;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
         /* СКРОЛЛБАР */
-        .students-list::-webkit-scrollbar,
-        .logs-list::-webkit-scrollbar {
-            width: 4px;
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        
-        .students-list::-webkit-scrollbar-track,
-        .logs-list::-webkit-scrollbar-track {
+
+        ::-webkit-scrollbar-track {
             background: #f0f0f3;
+            border-radius: 6px;
         }
-        
-        .students-list::-webkit-scrollbar-thumb,
-        .logs-list::-webkit-scrollbar-thumb {
+
+        ::-webkit-scrollbar-thumb {
             background: #c6c6c8;
-            border-radius: 4px;
+            border-radius: 6px;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="teacher-container">
-        <!-- ШАПКА С КОДОМ -->
-        <div class="header-premium">
-            <div class="code-box">
+    <div class="teacher-dashboard">
+        <!-- Верхняя панель с кодом и таймером -->
+        <div class="top-bar">
+            <div class="code-section">
                 <span class="code-label">КОД ТЕСТА</span>
                 <span class="code-value" id="gameCode">000000</span>
             </div>
             
             <div class="timer-value" id="timer">15:00</div>
             
-            <div class="controls">
-                <button class="apple-button" onclick="createGame()" id="createBtn">СОЗДАТЬ</button>
-                <button class="apple-button" onclick="startGame()" id="startBtn" style="display: none;">СТАРТ</button>
-                <button class="apple-button secondary" onclick="finishGame()" id="finishBtn" style="display: none;">ФИНИШ</button>
+            <div class="control-buttons">
+                <button class="apple-btn" onclick="createGame()" id="createBtn">Создать тест</button>
+                <button class="apple-btn" onclick="startGame()" id="startBtn" style="display: none;">Старт</button>
+                <button class="apple-btn secondary" onclick="finishGame()" id="finishBtn" style="display: none;">Финиш</button>
             </div>
         </div>
-        
-        <!-- ДВЕ КОЛОНКИ -->
-        <div class="dashboard">
-            <!-- ЛЕВАЯ КОЛОНКА - УЧЕНИКИ -->
-            <div class="students-section">
-                <div class="students-header">
+
+        <!-- Две колонки на весь экран -->
+        <div class="main-panel">
+            <!-- Левая колонка - ученики -->
+            <div class="students-panel">
+                <div class="panel-header">
                     <h2>Ученики</h2>
                     <span class="students-count" id="studentsCount">0</span>
                 </div>
                 
                 <div class="students-list" id="studentsList">
-                    <div class="empty-logs">Нет учеников</div>
+                    <div class="empty-state">Нет подключенных учеников</div>
                 </div>
             </div>
-            
-            <!-- ПРАВАЯ КОЛОНКА - ЛОГИ -->
-            <div class="logs-section">
+
+            <!-- Правая колонка - логи -->
+            <div class="logs-panel">
                 <div class="logs-header">
                     <h2>Активность</h2>
                 </div>
                 
                 <div class="logs-list" id="logsList">
-                    <div class="empty-logs">Здесь будет видно ответы учеников</div>
+                    <div class="empty-state">Здесь появится активность учеников</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyC_86gSXMHhRXk3q63usfJK3fQrFhQU7Ig",
             authDomain: "physicsproject-b5660.firebaseapp.com",
@@ -320,9 +361,7 @@
 
         let gameId = null;
         let timerInterval = null;
-        let logs = [];
 
-        // ===== СОЗДАТЬ ТЕСТ =====
         window.createGame = function() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             gameId = `game_${code}`;
@@ -332,8 +371,7 @@
                 startTime: null,
                 timeLimit: 900,
                 players: {},
-                logs: {},
-                createdAt: Date.now()
+                logs: {}
             }).then(() => {
                 document.getElementById('gameCode').innerText = code;
                 document.getElementById('createBtn').style.display = 'none';
@@ -344,7 +382,6 @@
             });
         };
 
-        // ===== СЛУШАТЬ =====
         function listenToGame() {
             db.ref(`games/${gameId}`).on('value', (snap) => {
                 const data = snap.val();
@@ -357,31 +394,14 @@
                     startTimer(data.startTime, data.timeLimit);
                 }
             });
-            
-            // Слушаем ответы учеников для логов
-            db.ref(`games/${gameId}/players`).on('child_changed', (snap) => {
-                const playerName = snap.key;
-                const playerData = snap.val();
-                
-                if (playerData.answers) {
-                    // Добавляем в логи
-                    const logRef = db.ref(`games/${gameId}/logs`).push();
-                    logRef.set({
-                        name: playerName,
-                        action: 'ответил на вопросы',
-                        timestamp: Date.now()
-                    });
-                }
-            });
         }
 
-        // ===== ОБНОВИТЬ СПИСОК УЧЕНИКОВ =====
         function updateStudentsList(players) {
             const list = document.getElementById('studentsList');
             const count = document.getElementById('studentsCount');
             
             if (!players || Object.keys(players).length === 0) {
-                list.innerHTML = '<div class="empty-logs">Нет учеников</div>';
+                list.innerHTML = '<div class="empty-state">Нет подключенных учеников</div>';
                 count.innerText = '0';
                 return;
             }
@@ -395,10 +415,10 @@
                 const percent = (answered / 30) * 100;
                 
                 html += `
-                    <div class="student-item">
-                        <div class="student-row">
+                    <div class="student-card">
+                        <div class="student-info">
                             <span class="student-name">${name}</span>
-                            <span class="student-status">${answered}/30</span>
+                            <span class="student-score">${player.score || 0} ✨</span>
                         </div>
                         <div class="student-progress">
                             <div class="student-progress-fill" style="width: ${percent}%"></div>
@@ -410,31 +430,31 @@
             list.innerHTML = html;
         }
 
-        // ===== ОБНОВИТЬ ЛОГИ =====
         function updateLogs(logsData) {
             const logsList = document.getElementById('logsList');
             
             if (!logsData || Object.keys(logsData).length === 0) {
-                logsList.innerHTML = '<div class="empty-logs">Здесь будет видно ответы учеников</div>';
+                logsList.innerHTML = '<div class="empty-state">Здесь появится активность учеников</div>';
                 return;
             }
             
             const logsArray = Object.entries(logsData)
                 .sort((a, b) => b[1].timestamp - a[1].timestamp)
-                .slice(0, 30);
+                .slice(0, 50);
             
             let html = '';
             logsArray.forEach(([id, log]) => {
-                const time = new Date(log.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const time = new Date(log.timestamp).toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
                 
                 html += `
-                    <div class="log-item">
-                        <div class="log-icon">📝</div>
-                        <div class="log-content">
-                            <div class="log-name">${log.name}</div>
-                            <div class="log-action">${log.action}</div>
-                            <div class="log-time">${time}</div>
-                        </div>
+                    <div class="log-entry">
+                        <div class="log-name">${log.name}</div>
+                        <div class="log-action">${log.action}</div>
+                        <div class="log-time">${time}</div>
                     </div>
                 `;
             });
@@ -442,7 +462,6 @@
             logsList.innerHTML = html;
         }
 
-        // ===== ТАЙМЕР =====
         function startTimer(startTime, limit) {
             if (timerInterval) clearInterval(timerInterval);
             
@@ -462,38 +481,32 @@
             }, 1000);
         }
 
-        // ===== СТАРТ =====
         window.startGame = function() {
             if (!gameId) return;
-            
             db.ref(`games/${gameId}`).update({
                 status: 'active',
                 startTime: Date.now()
             });
             
-            // Лог
             db.ref(`games/${gameId}/logs`).push().set({
                 name: 'Система',
-                action: 'тест начат',
+                action: 'Тест начат',
                 timestamp: Date.now()
             });
         };
 
-        // ===== ФИНИШ =====
         window.finishGame = function() {
             if (!gameId) return;
-            
             if (confirm('Завершить тест?')) {
                 db.ref(`games/${gameId}`).update({
-                    status: 'finished',
-                    finishedAt: Date.now()
+                    status: 'finished'
                 }).then(() => {
                     if (timerInterval) clearInterval(timerInterval);
                 });
                 
                 db.ref(`games/${gameId}/logs`).push().set({
                     name: 'Система',
-                    action: 'тест завершён',
+                    action: 'Тест завершён',
                     timestamp: Date.now()
                 });
             }
