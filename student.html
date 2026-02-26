@@ -20,7 +20,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
 
         .student-container {
@@ -28,7 +28,7 @@
             max-width: 600px;
             background: #2c2c30;
             border-radius: 32px;
-            padding: 32px;
+            padding: 28px;
             border: 1px solid #3a3a40;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
@@ -39,27 +39,32 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .name-badge {
             background: #3a3a40;
-            padding: 10px 20px;
+            padding: 8px 20px;
             border-radius: 30px;
             font-weight: 500;
             color: #ffffff;
             border: 1px solid #4a4a50;
+            font-size: 1rem;
+            white-space: nowrap;
         }
 
         .timer {
             font-family: 'SF Mono', 'Courier New', monospace;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 500;
             color: #0a84ff;
             background: #3a3a40;
-            padding: 8px 24px;
+            padding: 8px 20px;
             border-radius: 30px;
             border: 1px solid #4a4a50;
             text-shadow: 0 0 10px rgba(10, 132, 255, 0.3);
+            white-space: nowrap;
         }
 
         /* ПРОГРЕСС */
@@ -95,7 +100,7 @@
         .question-card {
             background: #3a3a40;
             border-radius: 28px;
-            padding: 28px;
+            padding: 24px;
             margin: 20px 0;
             border: 1px solid #4a4a50;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -113,45 +118,48 @@
         .calc-block {
             background: #2c2c30;
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 24px;
+            padding: 16px;
+            margin-bottom: 20px;
             border: 1px solid #4a4a50;
         }
 
         .calc-label {
             color: #9e9e9e;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
 
         .formula {
             font-family: 'SF Mono', 'Courier New', monospace;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             background: #3a3a40;
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-radius: 14px;
             color: #0a84ff;
             border: 1px solid #4a4a50;
+            overflow-x: auto;
+            white-space: nowrap;
         }
 
         /* ВАРИАНТЫ ОТВЕТОВ */
         .options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .option {
             background: #2c2c30;
             border: 1px solid #4a4a50;
             border-radius: 18px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             font-size: 1rem;
             color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s;
+            word-break: break-word;
         }
 
         .option:hover {
@@ -172,6 +180,8 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .nav-arrows {
@@ -180,18 +190,19 @@
         }
 
         .nav-arrow {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: #3a3a40;
             border: 1px solid #4a4a50;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
 
         .nav-arrow:hover {
@@ -200,22 +211,35 @@
             background: #404046;
         }
 
+        .nav-arrow:active {
+            transform: scale(0.95);
+        }
+
         .submit-btn {
             background: #0a84ff;
             color: white;
             border: none;
             border-radius: 40px;
-            padding: 12px 28px;
+            padding: 12px 24px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid #0a84ff;
+            flex: 1;
+            min-width: 160px;
         }
 
         .submit-btn:hover {
             background: #0071e3;
             box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #4a4a50;
+            border-color: #5a5a60;
         }
 
         /* ЭКРАНЫ */
@@ -233,7 +257,7 @@
             background: #3a3a40;
             border: 1px solid #4a4a50;
             border-radius: 18px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             font-size: 1rem;
             color: #ffffff;
             width: 100%;
@@ -255,7 +279,7 @@
             color: white;
             border: none;
             border-radius: 30px;
-            padding: 16px;
+            padding: 14px;
             font-size: 1rem;
             font-weight: 500;
             width: 100%;
@@ -269,29 +293,32 @@
             box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
         }
 
-        /* КОД ОЖИДАНИЯ */
+        /* КОД ОЖИДАНИЯ - ИСПРАВЛЕНО */
         .code-display {
             font-family: 'SF Mono', 'Courier New', monospace;
-            font-size: 4rem;
+            font-size: 3.5rem;
             text-align: center;
-            padding: 30px;
+            padding: 24px 16px;
             background: #3a3a40;
-            border-radius: 40px;
-            margin: 30px 0;
-            letter-spacing: 10px;
+            border-radius: 32px;
+            margin: 24px 0;
+            letter-spacing: 8px;
             color: #0a84ff;
             border: 1px solid #4a4a50;
             text-shadow: 0 0 20px rgba(10, 132, 255, 0.3);
+            word-break: break-all;
+            overflow-wrap: break-word;
         }
 
         /* РЕЗУЛЬТАТ */
         .score-display {
-            font-size: 5rem;
+            font-size: 4.5rem;
             font-weight: 700;
             text-align: center;
-            margin: 30px 0;
+            margin: 24px 0;
             color: #0a84ff;
             text-shadow: 0 0 30px rgba(10, 132, 255, 0.5);
+            word-break: break-word;
         }
 
         .message {
@@ -299,6 +326,7 @@
             color: #e0e0e0;
             font-size: 1.1rem;
             line-height: 1.6;
+            padding: 0 8px;
         }
 
         .text-center {
@@ -309,16 +337,92 @@
             color: #ffffff;
             font-size: 2.2rem;
             margin-bottom: 8px;
+            text-align: center;
+            word-break: break-word;
         }
 
         .subtitle {
             color: #9e9e9e;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
+            text-align: center;
+            font-size: 1rem;
         }
 
         #playersCount {
             color: #e0e0e0;
             font-size: 1.2rem;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        #errorMsg {
+            color: #ff453a;
+            margin-top: 16px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
+        @media (max-width: 480px) {
+            .student-container {
+                padding: 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .name-badge, .timer {
+                text-align: center;
+                width: 100%;
+            }
+            
+            .timer {
+                font-size: 1.8rem;
+            }
+            
+            .code-display {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            
+            .score-display {
+                font-size: 3.5rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+            }
+            
+            .nav-arrows {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .submit-btn {
+                width: 100%;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .option {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .code-display {
+                font-size: 2rem;
+                letter-spacing: 2px;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -330,17 +434,17 @@
             <div class="subtitle">30 заданий · полное внутреннее отражение</div>
             
             <input type="text" id="playerName" class="input-field" placeholder="Твоё имя" maxlength="15">
-            <input type="text" id="gameCode" class="input-field" placeholder="Код теста (6 цифр)" maxlength="6">
+            <input type="text" id="gameCode" class="input-field" placeholder="Код теста (6 цифр)" maxlength="6" inputmode="numeric">
             
             <button class="action-btn" onclick="joinGame()">Войти</button>
-            <div id="errorMsg" style="color: #ff453a; margin-top: 16px; text-align: center;"></div>
+            <div id="errorMsg"></div>
         </div>
 
         <!-- ЭКРАН ОЖИДАНИЯ -->
         <div id="screenWait" class="screen hidden">
-            <h1 style="text-align: center;">Ожидание</h1>
+            <h1>Ожидание</h1>
             <div class="code-display" id="displayCode">000000</div>
-            <div style="text-align: center; font-size: 1.2rem; color: #e0e0e0;" id="playersCount">0 игроков</div>
+            <div id="playersCount">0 игроков</div>
         </div>
 
         <!-- ЭКРАН ТЕСТА -->
@@ -377,19 +481,19 @@
             <!-- Навигация -->
             <div class="navigation">
                 <div class="nav-arrows">
-                    <div class="nav-arrow" onclick="prevQuestion()">←</div>
-                    <div class="nav-arrow" onclick="nextQuestion()">→</div>
+                    <div class="nav-arrow" onclick="prevQuestion()" id="prevBtn">←</div>
+                    <div class="nav-arrow" onclick="nextQuestion()" id="nextBtn">→</div>
                 </div>
-                <button class="submit-btn" onclick="submitTest()">Отправить</button>
+                <button class="submit-btn" onclick="submitTest()" id="submitBtn">Отправить результаты</button>
             </div>
         </div>
 
         <!-- ЭКРАН РЕЗУЛЬТАТА -->
         <div id="screenResult" class="screen hidden">
-            <h1 style="text-align: center;">Результат</h1>
+            <h1>Результат</h1>
             <div class="score-display" id="finalScore">0</div>
             <div class="message" id="finalMessage"></div>
-            <button class="action-btn" style="margin-top: 40px;" onclick="exit()">Выйти</button>
+            <button class="action-btn" style="margin-top: 32px;" onclick="exit()">Выйти</button>
         </div>
     </div>
 
@@ -625,13 +729,14 @@
         let currentQuestion = 0;
         let answers = {};
         let timerInterval = null;
+        let hasSubmitted = false;
 
         window.joinGame = function() {
             const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('gameCode').value.trim();
 
             if (!name) return showError('Введи имя');
-            if (!code || code.length !== 6) return showError('Код: 6 цифр');
+            if (!code || code.length !== 6) return showError('Код должен быть 6 цифр');
 
             playerName = name;
             gameId = `game_${code}`;
@@ -640,7 +745,13 @@
             document.getElementById('displayCode').innerText = code;
 
             db.ref(`games/${gameId}`).once('value', (snap) => {
-                if (!snap.val()) return showError('Игра не найдена');
+                const gameData = snap.val();
+                if (!gameData) return showError('Игра не найдена');
+
+                // Проверяем статус игры
+                if (gameData.status === 'finished') {
+                    return showError('Этот тест уже завершён');
+                }
 
                 db.ref(`games/${gameId}/players/${name}`).set({
                     name: name,
@@ -650,6 +761,9 @@
 
                 switchScreen('lobby', 'wait');
                 listenToGame();
+            }).catch(error => {
+                showError('Ошибка подключения');
+                console.error(error);
             });
         };
 
@@ -659,15 +773,23 @@
                 if (!data) return;
 
                 if (data.players) {
-                    document.getElementById('playersCount').innerText = 
-                        Object.keys(data.players).length + ' игроков';
+                    const count = Object.keys(data.players).length;
+                    document.getElementById('playersCount').innerText = count + ' игроков';
                 }
 
                 if (data.status === 'active') {
                     switchScreen('wait', 'game');
                     
+                    // Загружаем ответы, если есть
                     if (data.players?.[playerName]?.answers) {
                         answers = data.players[playerName].answers;
+                    }
+                    
+                    // Проверяем, отправлял ли уже
+                    if (data.players?.[playerName]?.submittedAt) {
+                        hasSubmitted = true;
+                        document.getElementById('submitBtn').disabled = true;
+                        document.getElementById('submitBtn').innerText = '✓ Результаты отправлены';
                     }
                     
                     showQuestion(currentQuestion);
@@ -685,20 +807,26 @@
         }
 
         function switchScreen(from, to) {
-            document.getElementById(`screen${from[0].toUpperCase() + from.slice(1)}`).classList.add('hidden');
-            document.getElementById(`screen${to[0].toUpperCase() + to.slice(1)}`).classList.remove('hidden');
+            document.getElementById(`screen${from.charAt(0).toUpperCase() + from.slice(1)}`).classList.add('hidden');
+            document.getElementById(`screen${to.charAt(0).toUpperCase() + to.slice(1)}`).classList.remove('hidden');
         }
 
         function startTimer(startTime, limit) {
             if (timerInterval) clearInterval(timerInterval);
             
             timerInterval = setInterval(() => {
-                const remaining = Math.max(0, limit - Math.floor((Date.now() - startTime) / 1000));
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, limit - elapsed);
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
+                
                 document.getElementById('displayTimer').innerText = 
                     `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                if (remaining <= 0) submitTest();
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
             }, 1000);
         }
 
@@ -728,6 +856,11 @@
         }
 
         window.selectAnswer = (qid, opt) => {
+            if (hasSubmitted) {
+                alert('Ты уже отправил результаты. Нельзя менять ответы.');
+                return;
+            }
+            
             answers[qid] = opt;
             db.ref(`games/${gameId}/players/${playerName}/answers/${qid}`).set(opt);
             
@@ -754,7 +887,17 @@
         };
 
         window.submitTest = function() {
-            if (Object.keys(answers).length < 30 && !confirm('Не все задания. Отправить?')) return;
+            if (hasSubmitted) {
+                alert('Ты уже отправил результаты');
+                return;
+            }
+            
+            const answeredCount = Object.keys(answers).length;
+            if (answeredCount < 30) {
+                if (!confirm(`Ты ответил только на ${answeredCount}/30 вопросов. Всё равно отправить?`)) {
+                    return;
+                }
+            }
             
             let correct = 0;
             for (let i = 1; i <= 30; i++) {
@@ -768,33 +911,59 @@
                 correct: correct,
                 submittedAt: Date.now()
             }).then(() => {
-                finishGame();
+                hasSubmitted = true;
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').innerText = '✓ Результаты отправлены';
+                alert('Результаты отправлены!');
+            }).catch(error => {
+                alert('Ошибка при отправке');
+                console.error(error);
             });
         };
 
         function finishGame() {
             if (timerInterval) clearInterval(timerInterval);
-            db.ref(`games/${gameId}/players/${playerName}`).once('value', (snap) => {
-                const player = snap.val();
-                switchScreen('game', 'result');
-                document.getElementById('finalScore').innerText = (player.score || 0) + ' ✨';
-                const correct = player.correct || 0;
-                let msg = `Правильно: ${correct}/30`;
-                if (correct >= 27) msg += ' · Идеально!';
-                else if (correct >= 24) msg += ' · Отлично!';
-                else if (correct >= 18) msg += ' · Хорошо';
-                else msg += ' · Попробуй ещё';
-                document.getElementById('finalMessage').innerText = msg;
-            });
+            
+            if (!hasSubmitted) {
+                // Если не отправлял, показываем результат на основе текущих ответов
+                let correct = 0;
+                for (let i = 1; i <= 30; i++) {
+                    if (answers[i] === QUESTIONS[i-1].correct) correct++;
+                }
+                const score = Math.round(correct * 3.33);
+                showResult(score, correct);
+            } else {
+                // Если отправлял, берём сохранённый результат
+                db.ref(`games/${gameId}/players/${playerName}`).once('value', (snap) => {
+                    const player = snap.val();
+                    showResult(player.score || 0, player.correct || 0);
+                });
+            }
+        }
+
+        function showResult(score, correct) {
+            switchScreen('game', 'result');
+            document.getElementById('finalScore').innerText = score + ' ✨';
+            
+            let message = `Правильно: ${correct}/30`;
+            if (correct >= 27) message += ' · Идеально!';
+            else if (correct >= 24) message += ' · Отлично!';
+            else if (correct >= 18) message += ' · Хорошо';
+            else message += ' · Попробуй ещё';
+            
+            document.getElementById('finalMessage').innerText = message;
         }
 
         function showError(msg) {
             document.getElementById('errorMsg').innerText = msg;
         }
 
-        window.exit = () => location.reload();
+        window.exit = () => {
+            location.reload();
+        };
 
-        document.getElementById('gameCode')?.addEventListener('input', function() {
+        // Форматирование поля ввода кода
+        document.getElementById('gameCode')?.addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '').substring(0, 6);
         });
     </script>
