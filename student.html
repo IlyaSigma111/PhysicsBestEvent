@@ -3,33 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FIBER OPTIC · премиум тест</title>
+    <title>FIBER OPTIC · ПРЕМИУМ ТЕСТ</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        /* ===== УВЕЛИЧИВАЕМ ВСЁ ===== */
+        .container {
+            max-width: 600px; /* Было 520px */
+            padding: 40px;    /* Было 32px */
+        }
+        
+        h1 {
+            font-size: 3.2rem;  /* Было 2.5rem */
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;   /* Было 1rem */
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        
+        /* ВЕРХНЯЯ ПАНЕЛЬ */
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .username {
+            padding: 14px 32px;   /* Было 10px 24px */
+            font-size: 1.2rem;
+            border-radius: 50px;
+        }
+        
+        .timer {
+            font-size: 2.8rem;    /* Было 2.2rem */
+            padding: 12px 32px;
+        }
+        
+        /* ПРОГРЕСС */
+        .progress {
+            height: 8px;           /* Было 6px */
+            margin: 25px 0;
+        }
+        
+        /* СТАТИСТИКА */
+        .stats {
+            font-size: 1.1rem;     /* Было 0.95rem */
+            margin: 15px 0;
+        }
+        
+        /* СЕТКА ВОПРОСОВ */
+        .grid {
+            gap: 10px;             /* Было 8px */
+            margin: 25px 0;
+        }
+        
+        .grid-item {
+            font-size: 1.2rem;     /* Было 1rem */
+            border-radius: 24px;    /* Было 20px */
+        }
+        
+        /* КАРТОЧКА ВОПРОСА */
+        .question-card {
+            border-radius: 60px;    /* Было 48px */
+            padding: 35px;          /* Было 28px */
+            margin: 20px 0;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;      /* Было 1.2rem */
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+        
+        /* БЛОК РАСЧЁТА */
+        .calc-block {
+            padding: 25px;          /* Было 20px */
+            border-radius: 35px;
+            margin-bottom: 35px;
+        }
+        
+        .calc-label {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .formula {
+            font-size: 1.6rem;      /* Было 1.3rem */
+            padding: 15px 25px;
+        }
+        
+        /* ОПЦИИ */
+        .options {
+            gap: 12px;              /* Было 10px */
+        }
+        
+        .option {
+            padding: 20px 30px;     /* Было 16px 24px */
+            font-size: 1.2rem;      /* Было 1rem */
+            border-radius: 120px;
+        }
+        
+        /* НАВИГАЦИЯ */
+        .navigation {
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .nav-arrow {
+            width: 70px;            /* Было 56px */
+            height: 70px;
+            font-size: 2.2rem;      /* Было 1.8rem */
+        }
+        
+        .nav-submit {
+            padding: 18px 40px;     /* Было 14px 32px */
+            font-size: 1.2rem;
+            border-radius: 50px;
+        }
+        
+        /* ПОЛЯ ВВОДА */
+        .input {
+            padding: 20px 30px;     /* Было 16px 24px */
+            font-size: 1.2rem;
+            margin: 12px 0;
+        }
+        
+        /* КНОПКИ */
+        .btn {
+            padding: 20px;          /* Было 16px */
+            font-size: 1.3rem;
+            margin: 12px 0;
+        }
+        
+        /* КОД ОЖИДАНИЯ */
+        .code-display {
+            font-size: 6rem;        /* Было 5rem */
+            margin: 40px 0;
+            padding: 40px;
+        }
+        
+        /* РЕЗУЛЬТАТ */
+        .score {
+            font-size: 7rem;        /* Было 6rem */
+            margin: 40px 0;
+        }
+        
+        /* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
+        @media (max-width: 450px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .timer {
+                font-size: 2.2rem;
+                padding: 8px 20px;
+            }
+            
+            .grid-item {
+                font-size: 1rem;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
+            
+            .nav-arrow {
+                width: 55px;
+                height: 55px;
+                font-size: 1.8rem;
+            }
+            
+            .code-display {
+                font-size: 4rem;
+                letter-spacing: 10px;
+            }
+            
+            .score {
+                font-size: 5rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Летающие частицы -->
     <div id="particles"></div>
 
     <div class="container">
         <!-- ЭКРАН ВХОДА -->
         <div id="screenLobby" class="screen">
             <h1>FIBER OPTIC</h1>
-            <div class="subtitle">ПОЛНОЕ ВНУТРЕННЕЕ ОТРАЖЕНИЕ</div>
+            <div class="subtitle">ПОЛНОЕ ВНУТРЕННЕЕ ОТРАЖЕНИЕ · 30 ЗАДАНИЙ</div>
             
             <input type="text" id="playerName" class="input" placeholder="ТВОЁ ИМЯ" maxlength="15">
             <input type="text" id="gameCode" class="input" placeholder="КОД ТЕСТА" maxlength="6">
             
             <button class="btn" onclick="joinGame()">ВОЙТИ</button>
-            <div id="errorMsg" class="text-center" style="color: #ff6b6b; margin-top: 20px;"></div>
+            <div id="errorMsg" class="text-center" style="color: #ff6b6b; margin-top: 25px; font-size: 1rem;"></div>
         </div>
 
         <!-- ЭКРАН ОЖИДАНИЯ -->
         <div id="screenWait" class="screen hidden">
             <h1>ОЖИДАНИЕ</h1>
             <div class="code-display" id="displayCode">000000</div>
-            <div class="text-center" style="font-size: 1.2rem;" id="playersCount">0 игроков</div>
-            <div class="text-center" style="margin-top: 30px; opacity: 0.7;">УЧИТЕЛЬ НАЧНЁТ ТЕСТ</div>
+            <div class="text-center" style="font-size: 1.3rem;" id="playersCount">0 ИГРОКОВ</div>
+            <div class="text-center" style="margin-top: 40px; opacity: 0.7; font-size: 1.1rem;">УЧИТЕЛЬ НАЧНЁТ ТЕСТ</div>
         </div>
 
         <!-- ЭКРАН ТЕСТА -->
@@ -72,13 +260,13 @@
         <div id="screenResult" class="screen hidden">
             <h1>РЕЗУЛЬТАТ</h1>
             <div class="score" id="finalScore">0</div>
-            <div class="text-center" id="finalMessage" style="font-size: 1.2rem;"></div>
-            <button class="btn" style="margin-top: 50px;" onclick="exit()">ВЫЙТИ</button>
+            <div class="text-center" id="finalMessage" style="font-size: 1.4rem;"></div>
+            <button class="btn" style="margin-top: 60px;" onclick="exit()">ВЫЙТИ</button>
         </div>
     </div>
 
     <script>
-        // ===== FIREBASE КОНФИГ =====
+        // ===== FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyC_86gSXMHhRXk3q63usfJK3fQrFhQU7Ig",
             authDomain: "physicsproject-b5660.firebaseapp.com",
@@ -92,15 +280,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ===== ПРЕМИАЛЬНЫЕ ЧАСТИЦЫ =====
-        for (let i = 0; i < 40; i++) {
+        // ===== ЧАСТИЦЫ =====
+        for (let i = 0; i < 50; i++) {
             const p = document.createElement('div');
             p.className = 'particle';
             p.style.left = Math.random() * 100 + '%';
             p.style.top = Math.random() * 100 + '%';
             p.style.animationDelay = Math.random() * 15 + 's';
             p.style.animationDuration = (20 + Math.random() * 30) + 's';
-            p.style.width = (2 + Math.random() * 4) + 'px';
+            p.style.width = (2 + Math.random() * 5) + 'px';
             p.style.height = p.style.width;
             document.getElementById('particles').appendChild(p);
         }
@@ -313,7 +501,7 @@
                 "1.5",
                 "1.8",
                 "2.0"
-            ], correct: 1, isCalc: true, formula: "n = c/v" },
+            ], correct: 1, isCalc: true, formula: "n = c / v" },
             
             // 27 (расчётное)
             { id: 27, text: "🧮 Луч падает из воздуха (n=1) в воду (n=1.33) под углом 45°. Найди угол преломления. sin45° = 0.707", options: [
@@ -329,7 +517,7 @@
                 "42°",
                 "48°",
                 "52°"
-            ], correct: 1, isCalc: true, formula: "αкр = arcsin(n₂/n₁)" },
+            ], correct: 1, isCalc: true, formula: "αкр = arcsin(n₂ / n₁)" },
             
             // 29 (расчётное)
             { id: 29, text: "🧮 Свет идёт из воды (n=1.33) в алмаз (n=2.4). Угол падения 50°. Найди угол преломления. sin50° = 0.766", options: [
