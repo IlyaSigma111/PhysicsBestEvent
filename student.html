@@ -3,310 +3,583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>📡 FIBER OPTIC · тест</title>
+    <title>📡 Оптоволокно · 30 заданий</title>
+    
+    <!-- Подключаем MEGA GLASS стили -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
 </head>
 <body>
+    <!-- Летающие фотоны (будут добавлены через JS) -->
     <div id="photons"></div>
-
-    <div class="container">
-        <!-- ЛОББИ -->
-        <div id="lobby" class="glass-card">
-            <div class="text-center">
-                <div style="font-size: 80px; margin-bottom: 20px;">📡</div>
-                <h1 style="color: #4facfe; font-size: 2.5rem; margin-bottom: 10px;">FIBER OPTIC</h1>
-                <div style="color: white; margin-bottom: 30px;">7 интерактивных заданий</div>
-                
-                <input type="text" id="name" class="input" placeholder="твоё имя" maxlength="15">
-                <input type="text" id="code" class="input" placeholder="код теста" maxlength="6">
-                
-                <button class="btn" onclick="joinGame()">🔮 войти</button>
-                <div id="error" style="color: #ff6b6b; margin-top: 20px;"></div>
-            </div>
+    
+    <div class="glass-card">
+        <!-- ЭКРАН 1: ВХОД -->
+        <div id="screenLobby" class="screen">
+            <h1>📡 FIBER OPTIC</h1>
+            <div class="subtitle">30 заданий · ПВО</div>
+            
+            <input type="text" id="playerName" class="input" placeholder="Твоё имя" maxlength="15">
+            <input type="text" id="gameCode" class="input" placeholder="Код теста (6 цифр)" maxlength="6">
+            
+            <button class="btn primary" onclick="joinGame()">🔮 Войти</button>
+            <div id="errorMsg" class="text-center" style="color: #ff6b6b; margin-top: 10px; font-size: 0.8rem;"></div>
         </div>
 
-        <!-- ОЖИДАНИЕ -->
-        <div id="wait" class="glass-card hidden">
-            <div class="text-center">
-                <div class="timer" id="waitCode">000000</div>
-                <div style="color: white; font-size: 1.2rem;" id="playersCount">0 игроков</div>
-                <div style="color: #4facfe; margin-top: 30px;">⏳ ждём старта</div>
-            </div>
+        <!-- ЭКРАН 2: ОЖИДАНИЕ -->
+        <div id="screenWait" class="screen hidden">
+            <h1>⏳ Ожидание</h1>
+            <div class="code-big" id="displayCode" style="font-size: 4rem; font-family: monospace; text-align: center; margin: 20px 0; letter-spacing: 10px;">000000</div>
+            <div class="text-center" id="playersCount">0 игроков</div>
+            <div class="text-center" style="margin-top: 20px; opacity: 0.8;">Учитель начнёт тест</div>
         </div>
 
-        <!-- ИГРА -->
-        <div id="game" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <span style="color: white;" id="playerName"></span>
-                <span class="timer" id="timer">15:00</span>
+        <!-- ЭКРАН 3: ТЕСТ -->
+        <div id="screenGame" class="screen hidden">
+            <!-- Шапка -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="color: white; font-size: 1rem;" id="displayName"></span>
+                <span class="timer" id="displayTimer">15:00</span>
             </div>
 
+            <!-- Прогресс -->
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <!-- Сетка заданий -->
-            <div class="quest-grid" id="questGrid"></div>
-
-            <!-- Контейнер для текущего задания -->
-            <div id="taskContainer"></div>
-
-            <!-- Кнопки навигации -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-                <button class="btn secondary" id="prevBtn" onclick="prevTask()">← назад</button>
-                <button class="btn" id="nextBtn" onclick="nextTask()">дальше →</button>
+            <!-- Счётчик -->
+            <div class="counter">
+                <span id="answeredCount">0/30</span>
+                <span>🧮 расчётные</span>
             </div>
-            
-            <button class="btn danger" id="finishBtn" onclick="finishGameEarly()" style="margin-top: 10px;">📨 завершить тест</button>
+
+            <!-- Сетка 6x5 -->
+            <div class="grid" id="questionsGrid"></div>
+
+            <!-- Текущий вопрос -->
+            <div class="question-box" id="questionBox">
+                <div class="question-text" id="questionText"></div>
+                
+                <!-- Блок для расчётных заданий -->
+                <div id="calcNote" class="calc-note hidden">
+                    <span style="font-weight: bold;">🧮 Расчётное задание</span><br>
+                    Сделай расчёт в тетради, затем выбери ответ
+                </div>
+                
+                <!-- Формула (для расчётных) -->
+                <div id="formulaDisplay" class="hidden"></div>
+                
+                <!-- Варианты ответов -->
+                <div class="options" id="optionsContainer"></div>
+            </div>
+
+            <!-- Навигация -->
+            <div class="nav">
+                <div class="nav-btn" onclick="prevQuestion()" id="prevBtn">← Назад</div>
+                <div class="nav-btn primary" onclick="nextQuestion()" id="nextBtn">Далее →</div>
+                <div class="nav-btn danger" onclick="submitTest()">📨 Отпр</div>
+            </div>
         </div>
 
-        <!-- РЕЗУЛЬТАТЫ -->
-        <div id="result" class="glass-card hidden">
-            <div class="text-center">
-                <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
-                <div class="timer" id="finalScore">0</div>
-                <div style="color: white; margin: 30px 0;" id="finalMessage"></div>
-                <button class="btn secondary" onclick="exit()">выйти</button>
+        <!-- ЭКРАН 4: РЕЗУЛЬТАТ -->
+        <div id="screenResult" class="screen hidden">
+            <h1>🏆 Результат</h1>
+            <div style="font-size: 4rem; text-align: center; margin: 30px 0;" id="finalScore">0</div>
+            <div class="text-center" id="finalMessage"></div>
+            <div style="margin-top: 30px;">
+                <button class="btn" onclick="exit()">Выйти</button>
             </div>
         </div>
     </div>
 
     <script>
         // ============================================
-        // СОЗДАЁМ ФОТОНЫ
+        // FIREBASE КОНФИГ (из внешнего файла или тут)
         // ============================================
-        for (let i = 0; i < 30; i++) {
-            const photon = document.createElement('div');
-            photon.className = 'photon';
-            photon.style.left = Math.random() * 100 + '%';
-            photon.style.top = Math.random() * 100 + '%';
-            photon.style.animationDelay = Math.random() * 10 + 's';
-            photon.style.animationDuration = (10 + Math.random() * 20) + 's';
-            document.getElementById('photons').appendChild(photon);
-        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_86gSXMHhRXk3q63usfJK3fQrFhQU7Ig",
+            authDomain: "physicsproject-b5660.firebaseapp.com",
+            databaseURL: "https://physicsproject-b5660-default-rtdb.firebaseio.com",
+            projectId: "physicsproject-b5660",
+            storageBucket: "physicsproject-b5660.firebasestorage.app",
+            messagingSenderId: "244631414073",
+            appId: "1:244631414073:web:69b4bdc74e233051f474e8"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         // ============================================
-        // 7 ИНТЕРАКТИВНЫХ ЗАДАНИЙ
+        // 30 ЗАДАНИЙ (25 тестовых + 5 расчётных)
         // ============================================
-        const TASKS = [
-            // ===== ЗАДАНИЕ 1: ПЕРЕВЁРТЫШИ =====
+        const QUESTIONS = [
+            // 1-5: Основы ПВО
             {
                 id: 1,
-                type: 'memory',
-                title: '🔮 Найди пары',
-                description: 'Открывай карточки и находи термины с определениями',
-                data: {
-                    cards: [
-                        { term: 'Сердцевина', def: 'центр волокна, где идёт свет' },
-                        { term: 'Оболочка', def: 'внешний слой с меньшим n' },
-                        { term: 'Крит. угол', def: 'угол, при котором начинается ПВО' },
-                        { term: 'ПВО', def: 'свет не выходит, n1 > n2' },
-                        { term: 'Одномодовое', def: 'тонкая сердцевина 8 мкм' },
-                        { term: 'Многомодовое', def: 'толстая сердцевина 50 мкм' }
-                    ]
-                }
+                text: "Что такое полное внутреннее отражение?",
+                options: [
+                    "Отражение света от зеркала",
+                    "Отражение без выхода в другую среду",
+                    "Преломление под прямым углом",
+                    "Поглощение света"
+                ],
+                correct: 1,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 2: КВЕСТ-ЛАБИРИНТ =====
             {
                 id: 2,
-                type: 'quest',
-                title: '🗺️ Квест лазера',
-                description: 'Проведи луч через все отражения. Выбирай узлы, где будет ПВО',
-                data: {
-                    nodes: [
-                        { id: 1, n1: 1.5, n2: 1.4, angle: 60, critical: 69, reflect: false },
-                        { id: 2, n1: 1.5, n2: 1.4, angle: 80, critical: 69, reflect: true },
-                        { id: 3, n1: 1.4, n2: 1.5, angle: 45, critical: null, reflect: false },
-                        { id: 4, n1: 1.5, n2: 1.0, angle: 30, critical: 42, reflect: false },
-                        { id: 5, n1: 1.5, n2: 1.0, angle: 50, critical: 42, reflect: true },
-                        { id: 6, n1: 1.33, n2: 1.0, angle: 60, critical: 49, reflect: true },
-                        { id: 7, n1: 1.5, n2: 1.33, angle: 70, critical: 62, reflect: true },
-                        { id: 8, n1: 1.33, n2: 1.5, angle: 40, critical: null, reflect: false }
-                    ],
-                    correctPath: [1, 2, 5, 7]
-                }
+                text: "При каком условии возникает ПВО?",
+                options: [
+                    "n1 < n2, угол любой",
+                    "n1 > n2, угол > критического",
+                    "n1 = n2",
+                    "в вакууме"
+                ],
+                correct: 1,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 3: КОНСТРУКТОР =====
             {
                 id: 3,
-                type: 'constructor',
-                title: '⚙️ Собери оптоволокно',
-                description: 'Выбери правильные компоненты для работы',
-                data: {
-                    categories: [
-                        {
-                            name: 'Сердцевина',
-                            parts: [
-                                { name: 'Стекло n=1.5', value: 1.5, correct: true },
-                                { name: 'Пластик n=1.4', value: 1.4, correct: false },
-                                { name: 'Воздух n=1.0', value: 1.0, correct: false }
-                            ]
-                        },
-                        {
-                            name: 'Оболочка',
-                            parts: [
-                                { name: 'Стекло n=1.4', value: 1.4, correct: true },
-                                { name: 'Стекло n=1.6', value: 1.6, correct: false },
-                                { name: 'Вода n=1.33', value: 1.33, correct: false }
-                            ]
-                        },
-                        {
-                            name: 'Лазер',
-                            parts: [
-                                { name: '850 нм (многомодовое)', value: 'multi', correct: false },
-                                { name: '1550 нм (одномодовое)', value: 'single', correct: true }
-                            ]
-                        }
-                    ]
-                }
+                text: "Что такое критический угол?",
+                options: [
+                    "Угол, при котором свет гаснет",
+                    "Угол, при котором начинается ПВО",
+                    "Угол полной поляризации",
+                    "Максимальный угол преломления"
+                ],
+                correct: 1,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 4: НАЙДИ ОШИБКИ =====
             {
                 id: 4,
-                type: 'errors',
-                title: '🚨 Найди ошибки',
-                description: 'В системе 4 ошибки. Найди их все',
-                data: {
-                    errors: [
-                        { text: 'Сердцевина n=1.4, Оболочка n=1.5', correct: false, hint: 'n оболочки должна быть меньше' },
-                        { text: 'Лазер 1550 нм в многомодовое волокно', correct: false, hint: '1550 нм → одномодовое' },
-                        { text: 'Угол 30°, крит. угол 42° — ПВО есть', correct: false, hint: 'ПВО только если угол > крит.' },
-                        { text: 'Длина 5000 км без усилителей', correct: false, hint: 'Нужны усилители каждые 100 км' },
-                        { text: 'Скорость света в стекле 200 000 км/с', correct: true }
-                    ]
-                }
+                text: "Формула критического угла:",
+                options: [
+                    "α = n1/n2",
+                    "α = arcsin(n2/n1)",
+                    "α = arcsin(n1/n2)",
+                    "α = n2/n1"
+                ],
+                correct: 1,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 5: БИТВА ЛУЧЕЙ =====
             {
                 id: 5,
-                type: 'battle',
-                title: '⚔️ Битва лучей',
-                description: 'Кто отразится, а кто выйдет?',
-                data: {
-                    beams: [
-                        { 
-                            name: 'Луч A',
-                            desc: 'Стекло (1.5) → Вода (1.33), угол 50°',
-                            critical: 62,
-                            willReflect: false
-                        },
-                        { 
-                            name: 'Луч B',
-                            desc: 'Стекло (1.5) → Воздух (1.0), угол 50°',
-                            critical: 42,
-                            willReflect: true
-                        }
-                    ]
-                }
+                text: "Для ПВО свет должен идти...",
+                options: [
+                    "Из менее плотной в более плотную",
+                    "Из более плотной в менее плотную",
+                    "В вакууме",
+                    "В любой среде"
+                ],
+                correct: 1,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 6: ГОНКА СВЕТА =====
+
+            // 6-10: Показатель преломления
             {
                 id: 6,
-                type: 'race',
-                title: '⏱️ Гонка света',
-                description: 'Посчитай время (скорость света в волокне ≈ 200 000 км/с)',
-                data: {
-                    questions: [
-                        { text: 'Москва → Питер (700 км)', answer: 3.5, unit: 'мс' },
-                        { text: 'Земля → Луна (384 000 км)', answer: 1.28, unit: 'с' },
-                        { text: 'Вокруг экватора (40 000 км)', answer: 0.133, unit: 'с' }
-                    ]
-                }
+                text: "Что показывает показатель преломления?",
+                options: [
+                    "Во сколько раз скорость света в вакууме больше, чем в среде",
+                    "Плотность вещества",
+                    "Температуру среды",
+                    "Длину волны"
+                ],
+                correct: 0,
+                isCalc: false
             },
-            
-            // ===== ЗАДАНИЕ 7: СОБЕРИ ФОРМУЛУ =====
             {
                 id: 7,
-                type: 'formula',
-                title: '🧩 Собери формулу',
-                description: 'Поставь части в правильный порядок (формула критического угла)',
-                data: {
-                    pieces: ['sin', 'α', '=', 'n₂', '/', 'n₁', 'arcsin', '(', ')'],
-                    correct: ['arcsin', '(', 'n₂', '/', 'n₁', ')']
-                }
+                text: "У какой среды показатель преломления больше?",
+                options: [
+                    "Вакуум (1.0)",
+                    "Воздух (1.0003)",
+                    "Вода (1.33)",
+                    "Стекло (1.5)"
+                ],
+                correct: 3,
+                isCalc: false
+            },
+            {
+                id: 8,
+                text: "n = c/v. Если n увеличивается, скорость света...",
+                options: [
+                    "Увеличивается",
+                    "Уменьшается",
+                    "Не меняется",
+                    "Становится нулевой"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 9,
+                text: "В какой среде свет движется быстрее всего?",
+                options: [
+                    "В стекле",
+                    "В воде",
+                    "В вакууме",
+                    "В алмазе"
+                ],
+                correct: 2,
+                isCalc: false
+            },
+            {
+                id: 10,
+                text: "Показатель преломления алмаза ≈",
+                options: [
+                    "1.33",
+                    "1.5",
+                    "2.4",
+                    "3.5"
+                ],
+                correct: 2,
+                isCalc: false
+            },
+
+            // 11-15: Оптоволокно
+            {
+                id: 11,
+                text: "Из чего состоит оптоволокно?",
+                options: [
+                    "Из меди и изоляции",
+                    "Из сердцевины и оболочки",
+                    "Из стекла и пластика",
+                    "Из воздуха"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 12,
+                text: "У сердцевины показатель преломления должен быть...",
+                options: [
+                    "Меньше, чем у оболочки",
+                    "Больше, чем у оболочки",
+                    "Равен оболочке",
+                    "Любой"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 13,
+                text: "Почему свет не выходит из оптоволокна?",
+                options: [
+                    "Из-за зеркального покрытия",
+                    "Из-за полного внутреннего отражения",
+                    "Из-за вакуума внутри",
+                    "Из-за магнитного поля"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 14,
+                text: "Одномодовое волокно имеет диаметр сердцевины:",
+                options: [
+                    "8 мкм",
+                    "50 мкм",
+                    "1 мм",
+                    "1 см"
+                ],
+                correct: 0,
+                isCalc: false
+            },
+            {
+                id: 15,
+                text: "Многомодовое волокно используется для...",
+                options: [
+                    "Сверхдальней связи",
+                    "Коротких дистанций",
+                    "Космической связи",
+                    "Подводных кабелей"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+
+            // 16-20: Применение
+            {
+                id: 16,
+                text: "Где используют оптоволокно в медицине?",
+                options: [
+                    "Рентген",
+                    "Эндоскоп",
+                    "УЗИ",
+                    "Томограф"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 17,
+                text: "Преимущество оптоволокна перед медным проводом:",
+                options: [
+                    "Дешевле",
+                    "Нет помех, выше скорость",
+                    "Легче паять",
+                    "Меньше весит"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 18,
+                text: "Как передаётся информация по оптоволокну?",
+                options: [
+                    "Электричеством",
+                    "Световыми импульсами",
+                    "Радиоволнами",
+                    "Звуком"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 19,
+                text: "На каком расстоянии ставят усилители?",
+                options: [
+                    "Каждые 10 км",
+                    "Каждые 100 км",
+                    "Каждые 1000 км",
+                    "Не ставят"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 20,
+                text: "Подводные интернет-кабели делают из:",
+                options: [
+                    "Меди",
+                    "Оптоволокна",
+                    "Алюминия",
+                    "Золота"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+
+            // 21-25: Разное
+            {
+                id: 21,
+                text: "Что происходит при угле падения больше критического?",
+                options: [
+                    "Свет выходит наружу",
+                    "Полное внутреннее отражение",
+                    "Свет поглощается",
+                    "Свет меняет цвет"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 22,
+                text: "Явление ПВО можно наблюдать:",
+                options: [
+                    "Только в лаборатории",
+                    "В природе (миражи, алмазы)",
+                    "Только в вакууме",
+                    "Только в воде"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 23,
+                text: "Что такое затухание в оптоволокне?",
+                options: [
+                    "Потеря сигнала",
+                    "Усиление сигнала",
+                    "Изменение цвета",
+                    "Нагрев кабеля"
+                ],
+                correct: 0,
+                isCalc: false
+            },
+            {
+                id: 24,
+                text: "Длина волны 1550 нм используется для:",
+                options: [
+                    "Коротких линий",
+                    "Дальней связи",
+                    "Освещения",
+                    "Медицины"
+                ],
+                correct: 1,
+                isCalc: false
+            },
+            {
+                id: 25,
+                text: "Что такое дисперсия в оптоволокне?",
+                options: [
+                    "Расплывание импульса",
+                    "Усиление света",
+                    "Отражение света",
+                    "Поглощение света"
+                ],
+                correct: 0,
+                isCalc: false
+            },
+
+            // ===== 26-30: РАСЧЁТНЫЕ (в тетради) =====
+            {
+                id: 26,
+                text: "🧮 Скорость света в стекле 200 000 км/с. Найди показатель преломления стекла. (c = 300 000 км/с)",
+                options: [
+                    "1.33",
+                    "1.5",
+                    "1.8",
+                    "2.0"
+                ],
+                correct: 1,
+                isCalc: true,
+                formula: "n = c/v"
+            },
+            {
+                id: 27,
+                text: "🧮 Луч падает из воздуха (n=1) в воду (n=1.33) под углом 45°. Найди угол преломления. sin45° = 0.707",
+                options: [
+                    "28°",
+                    "32°",
+                    "38°",
+                    "42°"
+                ],
+                correct: 1,
+                isCalc: true,
+                formula: "n₁·sinα = n₂·sinβ"
+            },
+            {
+                id: 28,
+                text: "🧮 Найди критический угол для границы стекло-воздух. n стекла = 1.5",
+                options: [
+                    "38°",
+                    "42°",
+                    "48°",
+                    "52°"
+                ],
+                correct: 1,
+                isCalc: true,
+                formula: "αкр = arcsin(n₂/n₁)"
+            },
+            {
+                id: 29,
+                text: "🧮 Свет идёт из воды (n=1.33) в алмаз (n=2.4). Угол падения 50°. Найди угол преломления. sin50° = 0.766",
+                options: [
+                    "24°",
+                    "28°",
+                    "32°",
+                    "36°"
+                ],
+                correct: 0,
+                isCalc: true,
+                formula: "n₁·sinα = n₂·sinβ"
+            },
+            {
+                id: 30,
+                text: "🧮 Сигнал идёт по оптоволокну 200 км. Скорость света в волокне 200 000 км/с. Сколько времени займёт передача?",
+                options: [
+                    "0.1 мс",
+                    "1 мс",
+                    "10 мс",
+                    "100 мс"
+                ],
+                correct: 1,
+                isCalc: true,
+                formula: "t = s / v"
             }
         ];
 
         // Состояние игры
         let gameId = null;
         let playerName = '';
-        let currentTask = 0;
+        let currentQuestion = 0;
         let answers = {};
         let timerInterval = null;
+        let gameData = null;
 
-        // ===== ВХОД В ИГРУ =====
+        // ===== СОЗДАЁМ ФОТОНЫ =====
+        for (let i = 0; i < 30; i++) {
+            const photon = document.createElement('div');
+            photon.className = 'photon';
+            photon.style.left = Math.random() * 100 + '%';
+            photon.style.top = Math.random() * 100 + '%';
+            photon.style.animationDelay = Math.random() * 10 + 's';
+            photon.style.animationDuration = (15 + Math.random() * 20) + 's';
+            document.getElementById('photons').appendChild(photon);
+        }
+
+        // ===== ВХОД =====
         window.joinGame = function() {
-            const name = document.getElementById('name').value.trim();
-            const code = document.getElementById('code').value.trim();
+            const name = document.getElementById('playerName').value.trim();
+            const code = document.getElementById('gameCode').value.trim();
 
-            if (!name) return showError('❌ введи имя');
-            if (!code || code.length !== 6) return showError('❌ код должен быть 6 цифр');
+            if (!name) return showError('Введи имя');
+            if (!code || code.length !== 6) return showError('Код: 6 цифр');
 
             playerName = name;
             gameId = `game_${code}`;
 
-            document.getElementById('playerName').innerText = name;
-            document.getElementById('waitCode').innerText = code;
+            document.getElementById('displayName').innerText = name;
+            document.getElementById('displayCode').innerText = code;
 
             db.ref(`games/${gameId}`).once('value', (snap) => {
-                const data = snap.val();
-                if (!data) {
-                    showError('❌ игра не найдена');
-                    return;
-                }
+                gameData = snap.val();
+                if (!gameData) return showError('Игра не найдена');
 
                 db.ref(`games/${gameId}/players/${name}`).set({
                     name: name,
                     joinedAt: Date.now(),
-                    answers: {},
-                    progress: 0
+                    answers: {}
                 });
 
-                document.getElementById('lobby').classList.add('hidden');
-                document.getElementById('wait').classList.remove('hidden');
+                switchScreen('lobby', 'wait');
                 listenToGame();
             });
         };
 
-        // ===== СЛУШАЕМ ИГРУ =====
+        // ===== СЛУШАТЬ =====
         function listenToGame() {
             db.ref(`games/${gameId}`).on('value', (snap) => {
-                const data = snap.val();
-                if (!data) return;
+                gameData = snap.val();
+                if (!gameData) return;
 
-                if (data.players) {
-                    const count = Object.keys(data.players).length;
-                    document.getElementById('playersCount').innerText = count + ' игроков';
+                if (gameData.players) {
+                    document.getElementById('playersCount').innerText = 
+                        Object.keys(gameData.players).length + ' игроков';
                 }
 
-                if (data.status === 'active') {
-                    document.getElementById('wait').classList.add('hidden');
-                    document.getElementById('game').classList.remove('hidden');
+                if (gameData.status === 'active') {
+                    switchScreen('wait', 'game');
                     
-                    if (data.players && data.players[playerName]) {
-                        answers = data.players[playerName].answers || {};
+                    // Загружаем ответы, если есть
+                    if (gameData.players && gameData.players[playerName]) {
+                        answers = gameData.players[playerName].answers || {};
                     }
                     
-                    renderQuestGrid();
-                    showTask(currentTask);
+                    renderGrid();
+                    showQuestion(currentQuestion);
                     
-                    if (data.startTime) {
-                        startTimer(data.startTime, data.timeLimit || 900);
+                    if (gameData.startTime) {
+                        startTimer(gameData.startTime, gameData.timeLimit || 900);
                     }
                 }
 
-                if (data.status === 'finished') {
+                if (gameData.status === 'finished') {
                     finishGame();
                 }
             });
+        }
+
+        // ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
+        function switchScreen(from, to) {
+            document.getElementById(`screen${from.charAt(0).toUpperCase() + from.slice(1)}`).classList.add('hidden');
+            document.getElementById(`screen${to.charAt(0).toUpperCase() + to.slice(1)}`).classList.remove('hidden');
         }
 
         // ===== ТАЙМЕР =====
@@ -319,532 +592,161 @@
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
                 
-                document.getElementById('timer').innerText = 
+                document.getElementById('displayTimer').innerText = 
                     `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
+                
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
-                    finishGame();
+                    submitTest();
                 }
             }, 1000);
         }
 
-        // ===== СЕТКА ЗАДАНИЙ =====
-        function renderQuestGrid() {
+        // ===== СЕТКА ВОПРОСОВ =====
+        function renderGrid() {
             let html = '';
-            for (let i = 1; i <= 7; i++) {
-                const answered = answers[i] !== undefined ? 'completed' : '';
-                const current = i === currentTask + 1 ? 'current' : '';
-                html += `<div class="quest-btn ${answered} ${current}" onclick="jumpToTask(${i-1})">${i}</div>`;
+            for (let i = 1; i <= 30; i++) {
+                const answered = answers[i] !== undefined ? 'answered' : '';
+                const current = i === currentQuestion + 1 ? 'current' : '';
+                const calcClass = QUESTIONS[i-1].isCalc ? 'calc' : '';
+                html += `<div class="grid-item ${answered} ${current} ${calcClass}" onclick="jumpToQuestion(${i-1})">${i}</div>`;
             }
-            document.getElementById('questGrid').innerHTML = html;
+            document.getElementById('questionsGrid').innerHTML = html;
             
-            const progress = (Object.keys(answers).length / 7) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
+            const answeredCount = Object.keys(answers).length;
+            document.getElementById('answeredCount').innerText = `✅ ${answeredCount}/30`;
+            document.getElementById('progressFill').style.width = (answeredCount / 30 * 100) + '%';
         }
 
-        // ===== ПЕРЕЙТИ К ЗАДАНИЮ =====
-        window.jumpToTask = function(index) {
-            currentTask = index;
-            renderQuestGrid();
-            showTask(index);
+        window.jumpToQuestion = (index) => {
+            currentQuestion = index;
+            renderGrid();
+            showQuestion(index);
         };
 
-        // ===== ПОКАЗАТЬ ЗАДАНИЕ =====
-        function showTask(index) {
-            const task = TASKS[index];
-            const container = document.getElementById('taskContainer');
+        // ===== ПОКАЗАТЬ ВОПРОС =====
+        function showQuestion(index) {
+            const q = QUESTIONS[index];
             
-            switch(task.type) {
-                case 'memory':
-                    showMemoryTask(task, container);
-                    break;
-                case 'quest':
-                    showQuestTask(task, container);
-                    break;
-                case 'constructor':
-                    showConstructorTask(task, container);
-                    break;
-                case 'errors':
-                    showErrorsTask(task, container);
-                    break;
-                case 'battle':
-                    showBattleTask(task, container);
-                    break;
-                case 'race':
-                    showRaceTask(task, container);
-                    break;
-                case 'formula':
-                    showFormulaTask(task, container);
-                    break;
-            }
-        }
-
-        // ===== ТИП 1: MEMORY =====
-        function showMemoryTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="memory-grid" id="memoryGrid"></div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            const cards = [];
-            task.data.cards.forEach((c, i) => {
-                cards.push({ id: `term_${i}`, text: c.term, pair: i, type: 'term' });
-                cards.push({ id: `def_${i}`, text: c.def, pair: i, type: 'def' });
-            });
+            document.getElementById('questionText').innerText = q.text;
             
-            for (let i = cards.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [cards[i], cards[j]] = [cards[j], cards[i]];
+            // Показываем формулу для расчётных
+            if (q.isCalc) {
+                document.getElementById('calcNote').classList.remove('hidden');
+                document.getElementById('formulaDisplay').innerHTML = `<div class="formula">📐 ${q.formula}</div>`;
+                document.getElementById('formulaDisplay').classList.remove('hidden');
+            } else {
+                document.getElementById('calcNote').classList.add('hidden');
+                document.getElementById('formulaDisplay').classList.add('hidden');
             }
 
-            let gridHtml = '';
-            cards.forEach((card, i) => {
-                gridHtml += `
-                    <div class="memory-card" id="card_${i}" data-pair="${card.pair}" onclick="flipCard(this, ${i})">
-                        ❓
+            // Варианты ответов
+            let optionsHtml = '';
+            const prefixes = ['prefix-a', 'prefix-b', 'prefix-c', 'prefix-d'];
+            q.options.forEach((opt, i) => {
+                const selected = answers[q.id] === i ? 'selected' : '';
+                optionsHtml += `
+                    <div class="option ${prefixes[i]} ${selected}" onclick="selectAnswer(${q.id}, ${i})">
+                        ${opt}
                     </div>
                 `;
             });
-            document.getElementById('memoryGrid').innerHTML = gridHtml;
-
-            window.memoryCards = cards;
-            window.flippedCards = [];
-            window.matchedPairs = [];
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
         }
 
-        window.flipCard = function(element, index) {
-            if (element.classList.contains('matched')) return;
-            if (window.flippedCards.length >= 2) return;
-            if (element.classList.contains('flipped')) return;
-
-            const card = window.memoryCards[index];
-            element.classList.add('flipped');
-            element.innerText = card.text;
+        // ===== ВЫБОР ОТВЕТА =====
+        window.selectAnswer = (qid, optIndex) => {
+            answers[qid] = optIndex;
             
-            window.flippedCards.push({ element, index, pair: card.pair, type: card.type });
-
-            if (window.flippedCards.length === 2) {
-                checkMatch();
-            }
-        };
-
-        function checkMatch() {
-            const [card1, card2] = window.flippedCards;
+            // Сохраняем в Firebase
+            db.ref(`games/${gameId}/players/${playerName}/answers/${qid}`).set(optIndex);
             
-            if (card1.pair === card2.pair && card1.type !== card2.type) {
-                card1.element.classList.add('matched');
-                card2.element.classList.add('matched');
-                window.matchedPairs.push(card1.pair);
-                
-                if (window.matchedPairs.length === 6) {
-                    setTimeout(() => {
-                        saveAnswer(1, true);
-                    }, 500);
-                }
-            } else {
-                setTimeout(() => {
-                    card1.element.classList.remove('flipped');
-                    card2.element.classList.remove('flipped');
-                    card1.element.innerText = '❓';
-                    card2.element.innerText = '❓';
-                }, 1000);
-            }
+            renderGrid();
             
-            window.flippedCards = [];
-        }
-
-        // ===== ТИП 2: КВЕСТ =====
-        function showQuestTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="quest-map" id="questMap"></div>
-                    <div style="color: #4facfe; text-align: center; margin: 20px;" id="questMessage"></div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let mapHtml = '';
-            task.data.nodes.forEach(node => {
-                mapHtml += `
-                    <div class="node" id="node_${node.id}" onclick="selectNode(${node.id})">
-                        <div>${node.id}</div>
-                        <small>${node.n1}→${node.n2}</small>
-                    </div>
-                `;
-            });
-            document.getElementById('questMap').innerHTML = mapHtml;
-
-            window.questData = task.data;
-            window.currentPath = [];
-            window.questTaskId = task.id;
-        }
-
-        window.selectNode = function(nodeId) {
-            const node = window.questData.nodes.find(n => n.id === nodeId);
-            const element = document.getElementById(`node_${nodeId}`);
-            
-            if (node.reflect) {
-                element.classList.add('correct');
-                window.currentPath.push(nodeId);
-                
-                if (window.currentPath.length === window.questData.correctPath.length) {
-                    const isCorrect = window.currentPath.every((id, i) => id === window.questData.correctPath[i]);
-                    document.getElementById('questMessage').innerText = isCorrect ? '✅ Луч прошёл!' : '❌ Не тот путь';
-                    if (isCorrect) saveAnswer(2, true);
-                }
-            } else {
-                element.classList.add('wrong');
-                document.getElementById('questMessage').innerText = '❌ Луч потерян';
-                setTimeout(() => element.classList.remove('wrong'), 1000);
-            }
-        };
-
-        // ===== ТИП 3: КОНСТРУКТОР =====
-        function showConstructorTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="constructor-parts" id="constructorParts"></div>
-                    <button class="btn small" onclick="checkConstructor()" style="margin-top: 20px;">✅ проверить</button>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let partsHtml = '';
-            task.data.categories.forEach((cat, catIndex) => {
-                partsHtml += `
-                    <div class="part-category">
-                        <div class="category-title">${cat.name}</div>
-                        <div class="part-options" data-category="${catIndex}">
-                `;
-                
-                cat.parts.forEach((part, partIndex) => {
-                    partsHtml += `
-                        <div class="part" onclick="selectPart(${catIndex}, ${partIndex})" 
-                             data-cat="${catIndex}" data-part="${partIndex}">
-                            ${part.name}
-                        </div>
-                    `;
-                });
-                
-                partsHtml += `</div></div>`;
-            });
-            
-            document.getElementById('constructorParts').innerHTML = partsHtml;
-            window.constructorData = task.data;
-            window.selectedParts = {};
-        }
-
-        window.selectPart = function(catIndex, partIndex) {
-            document.querySelectorAll(`[data-category="${catIndex}"] .part`).forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            event.target.classList.add('selected');
-            window.selectedParts[catIndex] = partIndex;
-        };
-
-        window.checkConstructor = function() {
-            const data = window.constructorData;
-            let correct = true;
-            
-            for (let catIndex in window.selectedParts) {
-                const partIndex = window.selectedParts[catIndex];
-                if (!data.categories[catIndex].parts[partIndex].correct) {
-                    correct = false;
-                }
-            }
-            
-            if (correct && Object.keys(window.selectedParts).length === 3) {
-                saveAnswer(3, true);
-                alert('✅ Правильно!');
-            } else {
-                alert('❌ Есть ошибки');
-            }
-        };
-
-        // ===== ТИП 4: НАЙДИ ОШИБКИ =====
-        function showErrorsTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="error-list" id="errorList"></div>
-                    <div style="color: #4facfe; margin-top: 20px;" id="errorsCount">Найдено: 0/4</div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let listHtml = '';
-            task.data.errors.forEach((error, index) => {
-                listHtml += `
-                    <div class="error-item" onclick="toggleError(${index})" id="error_${index}">
-                        <div class="error-icon">!</div>
-                        <div>${error.text}</div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('errorList').innerHTML = listHtml;
-            window.errorsData = task.data;
-            window.foundErrors = [];
-        }
-
-        window.toggleError = function(index) {
-            const element = document.getElementById(`error_${index}`);
-            const error = window.errorsData.errors[index];
-            
-            if (!error.correct) {
-                if (window.foundErrors.includes(index)) {
-                    element.classList.remove('fixed');
-                    window.foundErrors = window.foundErrors.filter(i => i !== index);
+            // Обновляем выделение в текущем вопросе
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                if (i === optIndex) {
+                    opt.classList.add('selected');
                 } else {
-                    element.classList.add('fixed');
-                    window.foundErrors.push(index);
-                }
-                
-                document.getElementById('errorsCount').innerText = `Найдено: ${window.foundErrors.length}/4`;
-                
-                if (window.foundErrors.length === 4) {
-                    saveAnswer(4, true);
-                }
-            }
-        };
-
-        // ===== ТИП 5: БИТВА =====
-        function showBattleTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="battle-arena" id="battleArena"></div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let arenaHtml = '';
-            task.data.beams.forEach((beam, index) => {
-                arenaHtml += `
-                    <div class="beam" onclick="selectBeam(${index})" id="beam_${index}">
-                        <h3 style="margin-bottom: 10px;">${beam.name}</h3>
-                        <p>${beam.desc}</p>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('battleArena').innerHTML = arenaHtml;
-            window.battleData = task.data;
-        }
-
-        window.selectBeam = function(index) {
-            const beam = window.battleData.beams[index];
-            const element = document.getElementById(`beam_${index}`);
-            
-            if (beam.willReflect) {
-                element.classList.add('correct');
-                saveAnswer(5, true);
-            } else {
-                element.classList.add('wrong');
-                setTimeout(() => element.classList.remove('wrong'), 1000);
-            }
-        };
-
-        // ===== ТИП 6: ГОНКА =====
-        function showRaceTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="race-questions" id="raceQuestions"></div>
-                    <button class="btn small" onclick="checkRace()">✅ проверить</button>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let questionsHtml = '';
-            task.data.questions.forEach((q, index) => {
-                questionsHtml += `
-                    <div class="race-item">
-                        <div class="race-question">${q.text}</div>
-                        <input type="number" class="race-input" id="race_${index}" step="0.001" placeholder="ответ в ${q.unit}">
-                    </div>
-                `;
-            });
-            
-            document.getElementById('raceQuestions').innerHTML = questionsHtml;
-            window.raceData = task.data;
-        }
-
-        window.checkRace = function() {
-            let correct = true;
-            
-            window.raceData.questions.forEach((q, index) => {
-                const input = document.getElementById(`race_${index}`);
-                const value = parseFloat(input.value);
-                
-                if (Math.abs(value - q.answer) < 0.01) {
-                    input.classList.add('correct');
-                } else {
-                    input.classList.remove('correct');
-                    correct = false;
+                    opt.classList.remove('selected');
                 }
             });
-            
-            if (correct) {
-                saveAnswer(6, true);
-                alert('✅ Все правильно!');
-            } else {
-                alert('❌ Есть ошибки');
-            }
         };
-
-        // ===== ТИП 7: ФОРМУЛА =====
-        function showFormulaTask(task, container) {
-            let html = `
-                <div class="glass-card" style="margin: 20px 0;">
-                    <h2 style="color: #4facfe;">${task.title}</h2>
-                    <p style="color: white; margin-bottom: 20px;">${task.description}</p>
-                    <div class="formula-builder">
-                        <div class="formula-pieces" id="formulaPieces"></div>
-                        <div class="formula-slot" id="formulaSlot"></div>
-                        <button class="btn small" onclick="checkFormula()">✅ проверить</button>
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            let piecesHtml = '';
-            task.data.pieces.forEach((piece, index) => {
-                piecesHtml += `
-                    <div class="piece" onclick="addToFormula('${piece}', ${index})">
-                        ${piece}
-                    </div>
-                `;
-            });
-            
-            document.getElementById('formulaPieces').innerHTML = piecesHtml;
-            window.formulaData = task.data;
-            window.currentFormula = [];
-        }
-
-        window.addToFormula = function(piece, index) {
-            window.currentFormula.push(piece);
-            renderFormulaSlot();
-        };
-
-        function renderFormulaSlot() {
-            let html = '';
-            window.currentFormula.forEach((piece, i) => {
-                html += `
-                    <div class="slot-piece" onclick="removeFromFormula(${i})">
-                        ${piece}
-                    </div>
-                `;
-            });
-            document.getElementById('formulaSlot').innerHTML = html;
-        }
-
-        window.removeFromFormula = function(index) {
-            window.currentFormula.splice(index, 1);
-            renderFormulaSlot();
-        };
-
-        window.checkFormula = function() {
-            const correct = window.formulaData.correct;
-            const isCorrect = window.currentFormula.length === correct.length &&
-                window.currentFormula.every((val, i) => val === correct[i]);
-            
-            if (isCorrect) {
-                saveAnswer(7, true);
-                alert('✅ Правильно!');
-            } else {
-                alert('❌ Неправильно');
-            }
-        };
-
-        // ===== СОХРАНИТЬ ОТВЕТ =====
-        function saveAnswer(taskId, correct) {
-            answers[taskId] = correct;
-            
-            db.ref(`games/${gameId}/players/${playerName}/answers/${taskId}`).set(correct);
-            db.ref(`games/${gameId}/players/${playerName}/progress`).set(Object.keys(answers).length);
-            
-            renderQuestGrid();
-            
-            if (taskId === currentTask + 1) {
-                document.getElementById('nextBtn').style.opacity = '1';
-            }
-        }
 
         // ===== НАВИГАЦИЯ =====
-        window.prevTask = function() {
-            if (currentTask > 0) {
-                currentTask--;
-                renderQuestGrid();
-                showTask(currentTask);
+        window.prevQuestion = () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderGrid();
+                showQuestion(currentQuestion);
             }
         };
 
-        window.nextTask = function() {
-            if (answers[currentTask + 1] === undefined) {
-                alert('Сначала выполни задание!');
-                return;
-            }
-            
-            if (currentTask < 6) {
-                currentTask++;
-                renderQuestGrid();
-                showTask(currentTask);
-            } else {
-                finishGameEarly();
+        window.nextQuestion = () => {
+            if (currentQuestion < 29) {
+                currentQuestion++;
+                renderGrid();
+                showQuestion(currentQuestion);
             }
         };
 
-        window.finishGameEarly = function() {
-            if (Object.keys(answers).length < 7) {
-                if (!confirm('Ты выполнил не все задания. Завершить?')) return;
+        // ===== ОТПРАВКА =====
+        window.submitTest = function() {
+            const answered = Object.keys(answers).length;
+            if (answered < 30) {
+                if (!confirm(`Ответов: ${answered}/30. Всё равно отправить?`)) return;
             }
-            finishGame();
+
+            // Подсчёт баллов (по 3.33 за каждый правильный ≈ 100)
+            let correct = 0;
+            for (let i = 1; i <= 30; i++) {
+                if (answers[i] === QUESTIONS[i-1].correct) correct++;
+            }
+            const score = Math.round(correct * 3.33);
+
+            db.ref(`games/${gameId}/players/${playerName}`).update({
+                answers: answers,
+                score: score,
+                correct: correct,
+                submittedAt: Date.now()
+            }).then(() => {
+                finishGame();
+            });
         };
 
-        // ===== ЗАВЕРШИТЬ ИГРУ =====
+        // ===== ЗАВЕРШЕНИЕ =====
         function finishGame() {
-            let score = 0;
-            for (let i = 1; i <= 7; i++) {
-                if (answers[i]) score += 10;
-            }
-            
-            db.ref(`games/${gameId}/players/${playerName}/score`).set(score);
-            
-            document.getElementById('game').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
-            document.getElementById('finalScore').innerText = score + ' ✨';
-            
-            if (score === 70) document.getElementById('finalMessage').innerText = '🌟 Идеально! Ты мастер света!';
-            else if (score >= 50) document.getElementById('finalMessage').innerText = '💫 Хорошо! Ты понял физику';
-            else document.getElementById('finalMessage').innerText = '🔮 Попробуй ещё раз';
-            
             if (timerInterval) clearInterval(timerInterval);
+            
+            db.ref(`games/${gameId}/players/${playerName}`).once('value', (snap) => {
+                const player = snap.val();
+                const score = player.score || 0;
+                const correct = player.correct || 0;
+                
+                switchScreen('game', 'result');
+                document.getElementById('finalScore').innerText = score + ' ✨';
+                
+                let message = `Правильно: ${correct}/30\n`;
+                if (correct >= 27) message += '🌟 Отлично!';
+                else if (correct >= 24) message += '💫 Хорошо!';
+                else if (correct >= 18) message += '📚 Надо повторить';
+                else message += '🔮 Попробуй ещё';
+                
+                document.getElementById('finalMessage').innerText = message;
+            });
         }
 
         // ===== ВСПОМОГАТЕЛЬНЫЕ =====
         function showError(msg) {
-            document.getElementById('error').innerText = msg;
+            document.getElementById('errorMsg').innerText = msg;
         }
 
-        window.exit = function() {
+        window.exit = () => {
             location.href = 'index.html';
         };
 
-        document.getElementById('code')?.addEventListener('input', function() {
+        // Формат кода (только цифры)
+        document.getElementById('gameCode')?.addEventListener('input', function() {
             this.value = this.value.replace(/\D/g, '').substring(0, 6);
         });
     </script>
