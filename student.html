@@ -4,113 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FIBER OPTIC · тест</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* APPLE СТИЛИ ДЛЯ УЧЕНИКА */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
         body {
             background: #f5f5f7;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        
+
         .student-container {
             width: 100%;
             max-width: 600px;
             background: white;
             border-radius: 32px;
             padding: 32px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
             border: 1px solid #f0f0f3;
         }
-        
+
         /* ШАПКА */
-        .student-header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
         }
-        
-        .student-name {
+
+        .name-badge {
             background: #f5f5f7;
             padding: 10px 20px;
             border-radius: 30px;
             font-weight: 500;
             color: #1d1d1f;
-            font-size: 1rem;
         }
-        
-        .student-timer {
-            font-family: 'SF Mono', monospace;
-            font-size: 2rem;
+
+        .timer {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 2.2rem;
             font-weight: 500;
             color: #1d1d1f;
             background: #f5f5f7;
-            padding: 8px 20px;
+            padding: 8px 24px;
             border-radius: 30px;
         }
-        
+
         /* ПРОГРЕСС */
         .progress-section {
             margin-bottom: 24px;
         }
-        
+
         .progress-stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
             color: #6e6e73;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
         }
-        
+
+        .progress-bar {
+            height: 4px;
+            background: #e9e9ed;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #0071e3;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
         /* КАРТОЧКА ВОПРОСА */
         .question-card {
             background: #f5f5f7;
             border-radius: 28px;
-            padding: 32px;
-            margin: 24px 0;
+            padding: 28px;
+            margin: 20px 0;
         }
-        
+
         .question-text {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             line-height: 1.5;
             color: #1d1d1f;
             font-weight: 500;
             margin-bottom: 24px;
         }
-        
-        /* ВАРИАНТЫ */
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .option {
-            background: white;
-            border: 1px solid #e9e9ed;
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 1rem;
-            color: #1d1d1f;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .option:hover {
-            border-color: #0071e3;
-        }
-        
-        .option.selected {
-            background: #0071e3;
-            border-color: #0071e3;
-            color: white;
-        }
-        
+
         /* РАСЧЁТНЫЙ БЛОК */
         .calc-block {
             background: white;
@@ -119,35 +110,64 @@
             margin-bottom: 24px;
             border: 1px solid #e9e9ed;
         }
-        
+
         .calc-label {
             color: #6e6e73;
             font-size: 0.85rem;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
-        
+
         .formula {
-            font-family: 'SF Mono', monospace;
+            font-family: 'SF Mono', 'Courier New', monospace;
             font-size: 1.2rem;
             background: #f5f5f7;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: #1d1d1f;
         }
-        
-        /* НАВИГАЦИЯ - ТОЛЬКО СТРЕЛКИ */
+
+        /* ВАРИАНТЫ ОТВЕТОВ */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: white;
+            border: 1px solid #e9e9ed;
+            border-radius: 18px;
+            padding: 16px 20px;
+            font-size: 1rem;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            border-color: #0071e3;
+        }
+
+        .option.selected {
+            background: #0071e3;
+            border-color: #0071e3;
+            color: white;
+        }
+
+        /* НАВИГАЦИЯ */
         .navigation {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 16px;
+            margin-top: 20px;
         }
-        
-        .nav-left {
+
+        .nav-arrows {
             display: flex;
             gap: 8px;
         }
-        
+
         .nav-arrow {
             width: 48px;
             height: 48px;
@@ -162,13 +182,13 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        
+
         .nav-arrow:hover {
             border-color: #0071e3;
             color: #0071e3;
         }
-        
-        .nav-submit {
+
+        .submit-btn {
             background: #0071e3;
             color: white;
             border: none;
@@ -179,67 +199,38 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        
-        .nav-submit:hover {
+
+        .submit-btn:hover {
             background: #0077ed;
         }
-        
+
         /* ЭКРАНЫ */
         .screen {
             display: flex;
             flex-direction: column;
         }
-        
+
         .hidden {
             display: none !important;
         }
-        
-        /* КОД ОЖИДАНИЯ */
-        .code-display {
-            font-family: 'SF Mono', monospace;
-            font-size: 4rem;
-            text-align: center;
-            padding: 30px;
-            background: #f5f5f7;
-            border-radius: 40px;
-            margin: 30px 0;
-            letter-spacing: 10px;
-            color: #1d1d1f;
-        }
-        
-        /* РЕЗУЛЬТАТ */
-        .score {
-            font-size: 5rem;
-            font-weight: 700;
-            text-align: center;
-            margin: 30px 0;
-            color: #1d1d1f;
-        }
-        
-        .final-message {
-            font-size: 1.2rem;
-            color: #6e6e73;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
+
         /* ПОЛЯ ВВОДА */
-        .apple-input {
+        .input-field {
             background: #f5f5f7;
             border: 1px solid #e9e9ed;
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 16px 20px;
             font-size: 1rem;
             width: 100%;
             margin: 8px 0;
         }
-        
-        .apple-input:focus {
+
+        .input-field:focus {
             outline: none;
             border-color: #0071e3;
         }
-        
-        .apple-button {
+
+        .action-btn {
             background: #0071e3;
             color: white;
             border: none;
@@ -251,81 +242,112 @@
             margin: 8px 0;
             cursor: pointer;
         }
+
+        /* КОД ОЖИДАНИЯ */
+        .code-display {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 4rem;
+            text-align: center;
+            padding: 30px;
+            background: #f5f5f7;
+            border-radius: 40px;
+            margin: 30px 0;
+            letter-spacing: 10px;
+            color: #1d1d1f;
+        }
+
+        /* РЕЗУЛЬТАТ */
+        .score-display {
+            font-size: 5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 30px 0;
+            color: #1d1d1f;
+        }
+
+        .message {
+            text-align: center;
+            color: #6e6e73;
+            font-size: 1.1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="student-container">
         <!-- ЭКРАН ВХОДА -->
         <div id="screenLobby" class="screen">
-            <h1>FIBER OPTIC</h1>
-            <div class="subtitle">30 заданий · полное внутреннее отражение</div>
+            <h1 style="font-size: 2.2rem; margin-bottom: 8px;">FIBER OPTIC</h1>
+            <div style="color: #6e6e73; margin-bottom: 32px;">30 заданий · полное внутреннее отражение</div>
             
-            <input type="text" id="playerName" class="apple-input" placeholder="Твоё имя" maxlength="15">
-            <input type="text" id="gameCode" class="apple-input" placeholder="Код теста" maxlength="6">
+            <input type="text" id="playerName" class="input-field" placeholder="Твоё имя" maxlength="15">
+            <input type="text" id="gameCode" class="input-field" placeholder="Код теста (6 цифр)" maxlength="6">
             
-            <button class="apple-button" onclick="joinGame()">Войти</button>
+            <button class="action-btn" onclick="joinGame()">Войти</button>
             <div id="errorMsg" style="color: #ff3b30; margin-top: 16px; text-align: center;"></div>
         </div>
 
         <!-- ЭКРАН ОЖИДАНИЯ -->
         <div id="screenWait" class="screen hidden">
-            <h1>Ожидание</h1>
+            <h1 style="text-align: center;">Ожидание</h1>
             <div class="code-display" id="displayCode">000000</div>
-            <div class="text-center" id="playersCount" style="font-size: 1.2rem;">0 игроков</div>
+            <div style="text-align: center; font-size: 1.2rem;" id="playersCount">0 игроков</div>
         </div>
 
         <!-- ЭКРАН ТЕСТА -->
         <div id="screenGame" class="screen hidden">
-            <!-- ШАПКА -->
-            <div class="student-header">
-                <span class="student-name" id="displayName"></span>
-                <span class="student-timer" id="displayTimer">15:00</span>
+            <!-- Шапка -->
+            <div class="header">
+                <span class="name-badge" id="displayName"></span>
+                <span class="timer" id="displayTimer">15:00</span>
             </div>
 
-            <!-- ПРОГРЕСС -->
+            <!-- Прогресс -->
             <div class="progress-section">
                 <div class="progress-stats">
                     <span id="answeredCount">0/30</span>
-                    <span>🧮 расчётные</span>
+                    <span>🧮 5 расчётных</span>
                 </div>
-                <div class="apple-progress">
-                    <div class="apple-progress-fill" id="progressFill"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
 
-            <!-- ВОПРОС -->
+            <!-- Карточка вопроса -->
             <div class="question-card">
                 <div class="question-text" id="questionText"></div>
                 
                 <div id="calcBlock" class="calc-block hidden">
-                    <div class="calc-label">расчёт в тетради</div>
+                    <div class="calc-label">Расчёт в тетради</div>
                     <div class="formula" id="formulaDisplay"></div>
                 </div>
                 
                 <div class="options" id="optionsContainer"></div>
             </div>
 
-            <!-- НАВИГАЦИЯ (ТОЛЬКО СТРЕЛКИ) -->
+            <!-- Навигация -->
             <div class="navigation">
-                <div class="nav-left">
-                    <div class="nav-arrow" onclick="prevQuestion()" id="prevBtn">←</div>
-                    <div class="nav-arrow" onclick="nextQuestion()" id="nextBtn">→</div>
+                <div class="nav-arrows">
+                    <div class="nav-arrow" onclick="prevQuestion()">←</div>
+                    <div class="nav-arrow" onclick="nextQuestion()">→</div>
                 </div>
-                <button class="nav-submit" onclick="submitTest()">Отправить</button>
+                <button class="submit-btn" onclick="submitTest()">Отправить</button>
             </div>
         </div>
 
         <!-- ЭКРАН РЕЗУЛЬТАТА -->
         <div id="screenResult" class="screen hidden">
-            <h1>Результат</h1>
-            <div class="score" id="finalScore">0</div>
-            <div class="final-message" id="finalMessage"></div>
-            <button class="apple-button" onclick="exit()" style="margin-top: 40px;">Выйти</button>
+            <h1 style="text-align: center;">Результат</h1>
+            <div class="score-display" id="finalScore">0</div>
+            <div class="message" id="finalMessage"></div>
+            <button class="action-btn" style="margin-top: 40px;" onclick="exit()">Выйти</button>
         </div>
     </div>
 
     <script>
-        // ===== FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyC_86gSXMHhRXk3q63usfJK3fQrFhQU7Ig",
             authDomain: "physicsproject-b5660.firebaseapp.com",
@@ -341,18 +363,223 @@
 
         // ===== 30 ВОПРОСОВ =====
         const QUESTIONS = [
-            // ... (те же 30 вопросов, что и в предыдущей версии)
-            // Я сократил для читаемости, но вставьте сюда все 30 из предыдущего файла
+            { id: 1, text: "Что такое полное внутреннее отражение?", options: [
+                "Отражение света от зеркала",
+                "Отражение без выхода в другую среду",
+                "Преломление под прямым углом",
+                "Поглощение света"
+            ], correct: 1, isCalc: false },
+            
+            { id: 2, text: "При каком условии возникает ПВО?", options: [
+                "n₁ < n₂, угол любой",
+                "n₁ > n₂, угол > критического",
+                "n₁ = n₂",
+                "в вакууме"
+            ], correct: 1, isCalc: false },
+            
+            { id: 3, text: "Что такое критический угол?", options: [
+                "Угол, при котором свет гаснет",
+                "Угол, при котором начинается ПВО",
+                "Угол полной поляризации",
+                "Максимальный угол преломления"
+            ], correct: 1, isCalc: false },
+            
+            { id: 4, text: "Формула критического угла:", options: [
+                "α = n₁/n₂",
+                "α = arcsin(n₂/n₁)",
+                "α = arcsin(n₁/n₂)",
+                "α = n₂/n₁"
+            ], correct: 1, isCalc: false },
+            
+            { id: 5, text: "Для ПВО свет должен идти...", options: [
+                "Из менее плотной в более плотную",
+                "Из более плотной в менее плотную",
+                "В вакууме",
+                "В любой среде"
+            ], correct: 1, isCalc: false },
+            
+            { id: 6, text: "Что показывает показатель преломления?", options: [
+                "Во сколько раз скорость света в вакууме больше, чем в среде",
+                "Плотность вещества",
+                "Температуру среды",
+                "Длину волны"
+            ], correct: 0, isCalc: false },
+            
+            { id: 7, text: "У какой среды показатель преломления больше?", options: [
+                "Вакуум (1.0)",
+                "Воздух (1.0003)",
+                "Вода (1.33)",
+                "Стекло (1.5)"
+            ], correct: 3, isCalc: false },
+            
+            { id: 8, text: "n = c/v. Если n увеличивается, скорость света...", options: [
+                "Увеличивается",
+                "Уменьшается",
+                "Не меняется",
+                "Становится нулевой"
+            ], correct: 1, isCalc: false },
+            
+            { id: 9, text: "В какой среде свет движется быстрее всего?", options: [
+                "В стекле",
+                "В воде",
+                "В вакууме",
+                "В алмазе"
+            ], correct: 2, isCalc: false },
+            
+            { id: 10, text: "Показатель преломления алмаза ≈", options: [
+                "1.33",
+                "1.5",
+                "2.4",
+                "3.5"
+            ], correct: 2, isCalc: false },
+            
+            { id: 11, text: "Из чего состоит оптоволокно?", options: [
+                "Из меди и изоляции",
+                "Из сердцевины и оболочки",
+                "Из стекла и пластика",
+                "Из воздуха"
+            ], correct: 1, isCalc: false },
+            
+            { id: 12, text: "У сердцевины показатель преломления должен быть...", options: [
+                "Меньше, чем у оболочки",
+                "Больше, чем у оболочки",
+                "Равен оболочке",
+                "Любой"
+            ], correct: 1, isCalc: false },
+            
+            { id: 13, text: "Почему свет не выходит из оптоволокна?", options: [
+                "Из-за зеркального покрытия",
+                "Из-за полного внутреннего отражения",
+                "Из-за вакуума внутри",
+                "Из-за магнитного поля"
+            ], correct: 1, isCalc: false },
+            
+            { id: 14, text: "Одномодовое волокно имеет диаметр сердцевины:", options: [
+                "8 мкм",
+                "50 мкм",
+                "1 мм",
+                "1 см"
+            ], correct: 0, isCalc: false },
+            
+            { id: 15, text: "Многомодовое волокно используется для...", options: [
+                "Сверхдальней связи",
+                "Коротких дистанций",
+                "Космической связи",
+                "Подводных кабелей"
+            ], correct: 1, isCalc: false },
+            
+            { id: 16, text: "Где используют оптоволокно в медицине?", options: [
+                "Рентген",
+                "Эндоскоп",
+                "УЗИ",
+                "Томограф"
+            ], correct: 1, isCalc: false },
+            
+            { id: 17, text: "Преимущество оптоволокна перед медным проводом:", options: [
+                "Дешевле",
+                "Нет помех, выше скорость",
+                "Легче паять",
+                "Меньше весит"
+            ], correct: 1, isCalc: false },
+            
+            { id: 18, text: "Как передаётся информация по оптоволокну?", options: [
+                "Электричеством",
+                "Световыми импульсами",
+                "Радиоволнами",
+                "Звуком"
+            ], correct: 1, isCalc: false },
+            
+            { id: 19, text: "На каком расстоянии ставят усилители?", options: [
+                "Каждые 10 км",
+                "Каждые 100 км",
+                "Каждые 1000 км",
+                "Не ставят"
+            ], correct: 1, isCalc: false },
+            
+            { id: 20, text: "Подводные интернет-кабели делают из:", options: [
+                "Меди",
+                "Оптоволокна",
+                "Алюминия",
+                "Золота"
+            ], correct: 1, isCalc: false },
+            
+            { id: 21, text: "Что происходит при угле падения больше критического?", options: [
+                "Свет выходит наружу",
+                "Полное внутреннее отражение",
+                "Свет поглощается",
+                "Свет меняет цвет"
+            ], correct: 1, isCalc: false },
+            
+            { id: 22, text: "Явление ПВО можно наблюдать:", options: [
+                "Только в лаборатории",
+                "В природе (миражи, алмазы)",
+                "Только в вакууме",
+                "Только в воде"
+            ], correct: 1, isCalc: false },
+            
+            { id: 23, text: "Что такое затухание в оптоволокне?", options: [
+                "Потеря сигнала",
+                "Усиление сигнала",
+                "Изменение цвета",
+                "Нагрев кабеля"
+            ], correct: 0, isCalc: false },
+            
+            { id: 24, text: "Длина волны 1550 нм используется для:", options: [
+                "Коротких линий",
+                "Дальней связи",
+                "Освещения",
+                "Медицины"
+            ], correct: 1, isCalc: false },
+            
+            { id: 25, text: "Что такое дисперсия в оптоволокне?", options: [
+                "Расплывание импульса",
+                "Усиление света",
+                "Отражение света",
+                "Поглощение света"
+            ], correct: 0, isCalc: false },
+            
+            { id: 26, text: "🧮 Скорость света в стекле 200 000 км/с. Найди показатель преломления стекла. (c = 300 000 км/с)", options: [
+                "1.33",
+                "1.5",
+                "1.8",
+                "2.0"
+            ], correct: 1, isCalc: true, formula: "n = c / v" },
+            
+            { id: 27, text: "🧮 Луч падает из воздуха (n=1) в воду (n=1.33) под углом 45°. Найди угол преломления. sin45° = 0.707", options: [
+                "28°",
+                "32°",
+                "38°",
+                "42°"
+            ], correct: 1, isCalc: true, formula: "n₁·sinα = n₂·sinβ" },
+            
+            { id: 28, text: "🧮 Найди критический угол для границы стекло-воздух. n стекла = 1.5", options: [
+                "38°",
+                "42°",
+                "48°",
+                "52°"
+            ], correct: 1, isCalc: true, formula: "αкр = arcsin(n₂ / n₁)" },
+            
+            { id: 29, text: "🧮 Свет идёт из воды (n=1.33) в алмаз (n=2.4). Угол падения 50°. Найди угол преломления. sin50° = 0.766", options: [
+                "24°",
+                "28°",
+                "32°",
+                "36°"
+            ], correct: 0, isCalc: true, formula: "n₁·sinα = n₂·sinβ" },
+            
+            { id: 30, text: "🧮 Сигнал идёт по оптоволокну 200 км. Скорость света в волокне 200 000 км/с. Сколько времени займёт передача?", options: [
+                "0.1 мс",
+                "1 мс",
+                "10 мс",
+                "100 мс"
+            ], correct: 1, isCalc: true, formula: "t = s / v" }
         ];
 
-        // Состояние
         let gameId = null;
         let playerName = '';
         let currentQuestion = 0;
         let answers = {};
         let timerInterval = null;
 
-        // ===== ВХОД =====
         window.joinGame = function() {
             const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('gameCode').value.trim();
@@ -457,7 +684,6 @@
         window.selectAnswer = (qid, opt) => {
             answers[qid] = opt;
             db.ref(`games/${gameId}/players/${playerName}/answers/${qid}`).set(opt);
-            updateProgress();
             
             // Лог для учителя
             db.ref(`games/${gameId}/logs`).push().set({
@@ -465,6 +691,8 @@
                 action: `ответил на вопрос ${qid}`,
                 timestamp: Date.now()
             });
+            
+            updateProgress();
             
             document.querySelectorAll('.option').forEach((el, i) => {
                 if (i === opt) el.classList.add('selected');
